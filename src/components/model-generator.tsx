@@ -8,9 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ArrowLeft, 
-  Upload, 
   Loader2, 
   CheckCircle2,
   Box,
@@ -19,8 +19,10 @@ import {
   Building2,
   Sparkles,
   FileText,
-  Layers
+  Layers,
+  Link
 } from 'lucide-react';
+import FileUploader from './file-uploader';
 
 interface ModelGeneratorProps {
   onBack: () => void;
@@ -58,6 +60,8 @@ interface ModelData {
 }
 
 export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
+  const [inputMode, setInputMode] = useState<'upload' | 'url'>('upload');
+  const [uploadedFile, setUploadedFile] = useState<{ preview: string; name: string } | null>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [characterName, setCharacterName] = useState('');
   const [material, setMaterial] = useState<'resin' | 'plush' | 'vinyl' | 'mixed'>('mixed');
@@ -87,9 +91,25 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
     { value: '1:12', desc: '约15cm（迷你收藏）' }
   ];
 
+  const handleFileSelect = (file: File, previewUrl: string) => {
+    setUploadedFile({ preview: previewUrl, name: file.name });
+    setImageUrl(previewUrl);
+    setError('');
+  };
+
+  const handleFileRemove = () => {
+    setUploadedFile(null);
+    setImageUrl('');
+  };
+
   const handleGenerate = async () => {
     if (!characterName) {
       setError('请提供角色名称');
+      return;
+    }
+
+    if (!uploadedFile && !imageUrl) {
+      setError('请上传图片或输入图片URL');
       return;
     }
 
@@ -110,7 +130,8 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          imageUrl: imageUrl || undefined,
+          imageUrl: uploadedFile ? undefined : imageUrl,
+          base64Data: uploadedFile ? uploadedFile.preview : undefined,
           characterName,
           material,
           scale,
@@ -179,23 +200,62 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
               </CardHeader>
               
               <CardContent className="space-y-6">
-                {/* Image URL */}
-                <div className="space-y-2">
-                  <Label htmlFor="modelImageUrl">角色素材 URL</Label>
-                  <div className="relative">
-                    <Input
-                      id="modelImageUrl"
-                      type="url"
-                      placeholder="https://example.com/character.jpg"
-                      value={imageUrl}
-                      onChange={(e) => setImageUrl(e.target.value)}
+                {/* Image Input */}
+                <Tabs value={inputMode} onValueChange={(v) => setInputMode(v as 'upload' | 'url')}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="upload" className="gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      本地上传
+                    </TabsTrigger>
+                    <TabsTrigger value="url" className="gap-2">
+                      <Link className="w-4 h-4" />
+                      图片链接
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="upload" className="mt-4">
+                    <FileUploader
+                      onFileSelect={handleFileSelect}
+                      onFileRemove={handleFileRemove}
+                      currentFile={uploadedFile}
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      maxSizeMB={10}
                     />
-                    <Upload className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    高清原图可提高建模精度，建议≥1080×1080
-                  </p>
-                </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="url" className="mt-4 space-y-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="modelImageUrl">角色素材 URL</Label>
+                      <div className="relative">
+                        <Input
+                          id="modelImageUrl"
+                          type="url"
+                          placeholder="https://example.com/character.jpg"
+                          value={imageUrl}
+                          onChange={(e) => {
+                            setImageUrl(e.target.value);
+                            setUploadedFile(null);
+                          }}
+                        />
+                        <Link className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      </div>
+                    </div>
+                    
+                    {imageUrl && (
+                      <div className="relative aspect-video max-w-[200px] mx-auto rounded-lg border bg-gray-50 dark:bg-gray-800 overflow-hidden">
+                        <img
+                          src={imageUrl}
+                          alt="URL Preview"
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '';
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
 
                 {/* Character Name */}
                 <div className="space-y-2">
@@ -218,7 +278,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                       <Button
                         key={option.value}
                         variant={material === option.value ? 'default' : 'outline'}
-                        onClick={() => setMaterial(option.value as any)}
+                        onClick={() => setMaterial(option.value as typeof material)}
                         className={material === option.value ? 'bg-blue-500 hover:bg-blue-600' : ''}
                         size="sm"
                       >
@@ -240,7 +300,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                       <Button
                         key={option.value}
                         variant={scale === option.value ? 'default' : 'outline'}
-                        onClick={() => setScale(option.value as any)}
+                        onClick={() => setScale(option.value as typeof scale)}
                         className={scale === option.value ? 'bg-cyan-500 hover:bg-cyan-600' : ''}
                       >
                         <Ruler className="w-4 h-4 mr-1" />
@@ -313,7 +373,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
 
                   <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <p className="text-sm text-blue-700 dark:text-blue-400">
-                      💡 完善商家信息后，我们将为你匹配供应链资源并提供订单对接服务
+                      完善商家信息后，我们将为你匹配供应链资源并提供订单对接服务
                     </p>
                   </div>
                 </CardContent>
@@ -323,7 +383,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
             {/* Generate Button */}
             <Button
               onClick={handleGenerate}
-              disabled={isGenerating}
+              disabled={isGenerating || !characterName || (!uploadedFile && !imageUrl)}
               className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
               size="lg"
             >
@@ -507,7 +567,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                     <Label>文件格式要求</Label>
                     <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
                       <div className="flex flex-wrap gap-2 mb-2">
-                        {modelData.fileFormat.推荐格式.map((format: string) => (
+                        {modelData.fileFormat.推荐格式.map((format) => (
                           <Badge key={format} variant="secondary">{format}</Badge>
                         ))}
                       </div>

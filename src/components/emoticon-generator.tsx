@@ -8,16 +8,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ArrowLeft, 
-  Upload, 
   Loader2, 
   Download, 
   CheckCircle2,
   MessageCircle,
   Instagram,
-  Sparkles
+  Sparkles,
+  Link
 } from 'lucide-react';
+import FileUploader from './file-uploader';
 
 interface EmoticonGeneratorProps {
   onBack: () => void;
@@ -32,6 +34,8 @@ interface Emoticon {
 }
 
 export default function EmoticonGenerator({ onBack }: EmoticonGeneratorProps) {
+  const [inputMode, setInputMode] = useState<'upload' | 'url'>('upload');
+  const [uploadedFile, setUploadedFile] = useState<{ preview: string; name: string } | null>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [characterName, setCharacterName] = useState('');
   const [sceneDescription, setSceneDescription] = useState('');
@@ -41,9 +45,21 @@ export default function EmoticonGenerator({ onBack }: EmoticonGeneratorProps) {
   const [emoticons, setEmoticons] = useState<Emoticon[]>([]);
   const [error, setError] = useState('');
 
+  const handleFileSelect = (file: File, previewUrl: string) => {
+    setUploadedFile({ preview: previewUrl, name: file.name });
+    setImageUrl(previewUrl); // 使用 base64 预览作为临时URL
+    setError('');
+  };
+
+  const handleFileRemove = () => {
+    setUploadedFile(null);
+    setImageUrl('');
+  };
+
   const handleGenerate = async () => {
-    if (!imageUrl && !characterName && !sceneDescription) {
-      setError('请提供图片URL或角色/场景描述');
+    // 检查是否有图片素材
+    if (!uploadedFile && !imageUrl) {
+      setError('请上传图片或输入图片URL');
       return;
     }
 
@@ -64,7 +80,8 @@ export default function EmoticonGenerator({ onBack }: EmoticonGeneratorProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          imageUrl: imageUrl || undefined,
+          imageUrl: uploadedFile ? undefined : imageUrl, // base64直接传，其他用URL
+          base64Data: uploadedFile ? uploadedFile.preview : undefined,
           characterName: characterName || undefined,
           sceneDescription: sceneDescription || undefined,
           count: 3,
@@ -137,28 +154,73 @@ export default function EmoticonGenerator({ onBack }: EmoticonGeneratorProps) {
             <CardHeader>
               <CardTitle>素材上传</CardTitle>
               <CardDescription>
-                提供电影图片或视频片段，AI将提取核心画面生成表情包
+                提供电影图片，AI将提取核心画面生成表情包
               </CardDescription>
             </CardHeader>
             
             <CardContent className="space-y-6">
-              {/* Image URL Input */}
-              <div className="space-y-2">
-                <Label htmlFor="imageUrl">电影素材 URL</Label>
-                <div className="relative">
-                  <Input
-                    id="imageUrl"
-                    type="url"
-                    placeholder="https://example.com/movie-poster.jpg"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                  />
-                  <Upload className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                </div>
-                <p className="text-xs text-gray-500">
-                  支持JPG/PNG/WebP，建议分辨率≥1080×1080
-                </p>
-              </div>
+              {/* Input Mode Tabs */}
+              <Tabs value={inputMode} onValueChange={(v) => setInputMode(v as 'upload' | 'url')}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="upload" className="gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    本地上传
+                  </TabsTrigger>
+                  <TabsTrigger value="url" className="gap-2">
+                    <Link className="w-4 h-4" />
+                    图片链接
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="upload" className="mt-4">
+                  <div className="space-y-3">
+                    <FileUploader
+                      onFileSelect={handleFileSelect}
+                      onFileRemove={handleFileRemove}
+                      currentFile={uploadedFile}
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      maxSizeMB={10}
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="url" className="mt-4 space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="imageUrl">图片 URL</Label>
+                    <div className="relative">
+                      <Input
+                        id="imageUrl"
+                        type="url"
+                        placeholder="https://example.com/movie-poster.jpg"
+                        value={imageUrl}
+                        onChange={(e) => {
+                          setImageUrl(e.target.value);
+                          setUploadedFile(null);
+                        }}
+                      />
+                      <Link className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      支持JPG/PNG/WebP，建议分辨率≥1080×1080
+                    </p>
+                  </div>
+                  
+                  {/* URL Preview */}
+                  {imageUrl && (
+                    <div className="relative aspect-square max-w-[200px] mx-auto rounded-lg border bg-gray-50 dark:bg-gray-800 overflow-hidden">
+                      <img
+                        src={imageUrl}
+                        alt="URL Preview"
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '';
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
 
               {/* Character Name */}
               <div className="space-y-2">
@@ -219,7 +281,7 @@ export default function EmoticonGenerator({ onBack }: EmoticonGeneratorProps) {
               {/* Generate Button */}
               <Button
                 onClick={handleGenerate}
-                disabled={isGenerating}
+                disabled={isGenerating || (!uploadedFile && !imageUrl)}
                 className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
                 size="lg"
               >
@@ -257,12 +319,12 @@ export default function EmoticonGenerator({ onBack }: EmoticonGeneratorProps) {
               {/* Tips */}
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">
-                  💡 生成技巧
+                  生成技巧
                 </h4>
                 <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
+                  <li>• 支持拖拽上传本地文件</li>
                   <li>• 提供高清原图效果更佳</li>
                   <li>• 明确角色名称可保留特征</li>
-                  <li>• 描述场景有助于AI理解需求</li>
                   <li>• 生成后可下载PNG格式使用</li>
                 </ul>
               </div>
