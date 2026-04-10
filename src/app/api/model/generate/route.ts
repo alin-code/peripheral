@@ -3,6 +3,7 @@ import { ImageGenerationClient, Config, HeaderUtils } from 'coze-coding-dev-sdk'
 
 interface ModelRequest {
   imageUrl?: string;
+  base64Data?: string;
   characterName: string;
   material?: 'resin' | 'plush' | 'vinyl' | 'mixed';
   scale?: '1:6' | '1:8' | '1:12';
@@ -46,7 +47,7 @@ const MATERIAL_SUGGESTIONS = {
 };
 
 // 生成建模图描述
-function generateModelDescription(characterName: string, material: string): {
+function generateModelDescription(characterName: string): {
   front: string;
   side: string;
   back: string;
@@ -61,7 +62,7 @@ function generateModelDescription(characterName: string, material: string): {
 }
 
 // 计算标准尺寸
-function calculateDimensions(scale: string, material: string): {
+function calculateDimensions(scale: string): {
   height: number;
   headDiameter: number;
   chestWidth: number;
@@ -90,12 +91,20 @@ function calculateDimensions(scale: string, material: string): {
 export async function POST(request: NextRequest) {
   try {
     const body: ModelRequest = await request.json();
-    const { imageUrl, characterName, material = 'mixed', scale = '1:8', businessInfo } = body;
+    const { imageUrl, base64Data, characterName, material = 'mixed', scale = '1:8', businessInfo } = body;
 
     // 参数验证
     if (!characterName) {
       return NextResponse.json(
         { success: false, error: '请提供角色名称' },
+        { status: 400 }
+      );
+    }
+
+    // 至少需要一种图片输入
+    if (!imageUrl && !base64Data) {
+      return NextResponse.json(
+        { success: false, error: '请提供图片URL或上传图片文件' },
         { status: 400 }
       );
     }
@@ -107,28 +116,36 @@ export async function POST(request: NextRequest) {
     const config = new Config();
     const client = new ImageGenerationClient(config, customHeaders);
 
-    // 生成建模参考图
-    const modelPrompt = `Professional 3D model reference sheet for toy figure production, character "${characterName}", 
-      clean white background, front view, side view, back view, three-angle layout,
-      technical illustration style, detailed measurements, 
-      no text, no watermark, high contrast outlines`;
+    // 处理图片输入
+    let referenceImage: string | string[] | undefined;
+    
+    if (base64Data) {
+      referenceImage = [base64Data];
+    } else if (imageUrl) {
+      referenceImage = [imageUrl];
+    }
 
-    const imagePrompt = imageUrl 
-      ? `Reference image for 3D model, character "${characterName}", clear image quality`
-      : modelPrompt;
+    // 生成建模参考图 - 使用参考图片
+    const modelPrompt = `Based on the reference image of character "${characterName}", 
+      create a professional 3D model reference sheet for toy figure production,
+      clean white background, front view, side view, back view, three-angle layout,
+      technical illustration style, detailed measurements,
+      no text, no watermark, high contrast outlines, maintain character features`;
+
+    console.log('正在生成建模图，使用参考图片:', referenceImage ? '是' : '否');
 
     const response = await client.generate({
-      prompt: imagePrompt,
+      prompt: modelPrompt,
       size: '4K',
-      image: imageUrl ? [imageUrl] : undefined,
+      image: referenceImage,
       watermark: false
     });
 
     const helper = client.getResponseHelper(response);
 
     // 生成建模参数文档
-    const descriptions = generateModelDescription(characterName, material);
-    const dimensions = calculateDimensions(scale, material);
+    const descriptions = generateModelDescription(characterName);
+    const dimensions = calculateDimensions(scale);
     const materialInfo = MATERIAL_SUGGESTIONS[material as keyof typeof MATERIAL_SUGGESTIONS] || MATERIAL_SUGGESTIONS.mixed;
 
     const modelData = {
@@ -136,7 +153,7 @@ export async function POST(request: NextRequest) {
       model: {
         characterName,
         scale,
-        referenceImage: helper.success ? helper.imageUrls[0] : null,
+        referenceImage: helper.success && helper.imageUrls.length > 0 ? helper.imageUrls[0] : null,
         views: descriptions,
         dimensions: {
           高度: `${dimensions.height}cm`,

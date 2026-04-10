@@ -6,7 +6,7 @@ const EMOTICON_CAPTIONS = {
   wechat: [
     "绝了！",
     "我太难了",
-    "救命🆘",
+    "救命",
     "爱了爱了",
     "冲鸭！",
     "绝了绝了",
@@ -30,10 +30,11 @@ const EMOTICON_CAPTIONS = {
 };
 
 interface EmoticonRequest {
-  imageUrl?: string;
-  characterName?: string;
-  sceneDescription?: string;
-  count?: number;
+  imageUrl?: string;       // 图片URL
+  base64Data?: string;     // Base64图片数据
+  characterName?: string;  // 角色名称
+  sceneDescription?: string; // 场景描述
+  count?: number;          // 生成数量
   platform?: 'wechat' | 'douyin' | 'both';
 }
 
@@ -47,9 +48,26 @@ function getRandomCaptions(platform: string, count: number): string[] {
   return shuffled.slice(0, count);
 }
 
+// 从base64提取MIME类型
+function extractMimeType(base64Data: string): string | null {
+  const match = base64Data.match(/^data:image\/(\w+);base64,/);
+  return match ? `image/${match[1]}` : null;
+}
+
+// 从base64提取纯数据部分
+function extractBase64Data(base64Data: string): string {
+  return base64Data.replace(/^data:image\/\w+;base64,/, '');
+}
+
 // 生成提示词
-function generatePrompt(characterName?: string, sceneDescription?: string): string {
-  let prompt = 'High quality emoticon/sticker, ';
+function generatePrompt(characterName?: string, sceneDescription?: string, isReference = false): string {
+  let prompt = '';
+  
+  if (isReference) {
+    prompt = 'Based on the reference image, ';
+  }
+  
+  prompt += 'High quality emoticon/sticker for messaging app, ';
   
   if (characterName) {
     prompt += `character "${characterName}", `;
@@ -60,8 +78,8 @@ function generatePrompt(characterName?: string, sceneDescription?: string): stri
   }
   
   prompt += 'exaggerated expression, clear image, white or transparent background, ';
-  prompt += 'suitable for messaging app stickers, vibrant colors, cartoon style, ';
-  prompt += 'without text overlay';
+  prompt += 'vibrant colors, cartoon style, clean lines, ';
+  prompt += 'without text overlay, multiple variations';
   
   return prompt;
 }
@@ -70,12 +88,12 @@ function generatePrompt(characterName?: string, sceneDescription?: string): stri
 export async function POST(request: NextRequest) {
   try {
     const body: EmoticonRequest = await request.json();
-    const { imageUrl, characterName, sceneDescription, count = 3, platform = 'both' } = body;
+    const { imageUrl, base64Data, characterName, sceneDescription, count = 3, platform = 'both' } = body;
 
-    // 参数验证
-    if (!imageUrl && !characterName && !sceneDescription) {
+    // 参数验证 - 至少需要一种图片输入
+    if (!imageUrl && !base64Data) {
       return NextResponse.json(
-        { success: false, error: '请提供图片URL或角色/场景描述' },
+        { success: false, error: '请提供图片URL或上传图片文件' },
         { status: 400 }
       );
     }
@@ -87,29 +105,43 @@ export async function POST(request: NextRequest) {
     const config = new Config();
     const client = new ImageGenerationClient(config, customHeaders);
 
+    // 处理图片输入 - 优先使用base64
+    let referenceImage: string | string[] | undefined;
+    
+    if (base64Data) {
+      // Base64数据 - 直接作为参考图片
+      referenceImage = [base64Data];
+    } else if (imageUrl) {
+      // URL数据
+      referenceImage = [imageUrl];
+    }
+
     // 生成基础提示词
-    const basePrompt = generatePrompt(characterName, sceneDescription);
+    const basePrompt = generatePrompt(characterName, sceneDescription, !!referenceImage);
     const captionCount = Math.min(Math.max(count, 3), 5);
     
-    // 生成不同表情变体
+    // 生成不同表情变体的提示词
     const emotionVariations = [
-      'surprised expression, wide eyes, open mouth',
-      'happy expression, big smile, closed eyes',
-      'crazy expression, messed up hair, excited',
+      'surprised expression, wide eyes, open mouth, shocked',
+      'happy expression, big smile, closed eyes, joyful',
+      'funny expression, messed up hair, silly face',
       'speechless expression, flat mouth, sweat drops',
-      'angry expression, furrowed brows, red face'
+      'angry expression, furrowed brows, frustrated'
     ];
 
     // 生成多个表情包
     const emoticonRequests = [];
     for (let i = 0; i < captionCount; i++) {
-      const emotionPrompt = `${basePrompt}, ${emotionVariations[i % emotionVariations.length]}`;
+      const emotionPrompt = `${basePrompt}, emotion variation ${i + 1}: ${emotionVariations[i % emotionVariations.length]}`;
       emoticonRequests.push({
         prompt: emotionPrompt,
         size: '2K',
-        image: imageUrl ? [imageUrl] : undefined
+        image: referenceImage
       });
     }
+
+    console.log('正在生成表情包，使用参考图片:', referenceImage ? '是' : '否');
+    console.log('提示词示例:', emoticonRequests[0]?.prompt.substring(0, 100) + '...');
 
     // 批量生成
     const responses = await client.batchGenerate(emoticonRequests);
@@ -132,14 +164,14 @@ export async function POST(request: NextRequest) {
           url: helper.imageUrls[0],
           caption: captions[index] || '',
           platform: isWechat ? 'wechat' : (index % 2 === 0 ? 'wechat' : 'douyin'),
-          emotionType: emotionVariations[index % emotionVariations.length].split(' expression')[0]
+          emotionType: emotionVariations[index % emotionVariations.length].split(',')[0]
         });
       }
     });
 
     if (emoticons.length === 0) {
       return NextResponse.json(
-        { success: false, error: '表情包生成失败，请稍后重试' },
+        { success: false, error: '表情包生成失败，请稍后重试或检查图片格式' },
         { status: 500 }
       );
     }
