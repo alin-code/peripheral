@@ -1,56 +1,204 @@
-# 项目上下文
+# 电影周边建模与表情包定制服务 - AI助手
 
-### 版本技术栈
+## 项目概述
+
+这是一个专业的电影周边建模与表情包定制服务AI助手，为用户提供精准的表情包生成和周边建模图输出服务，同时支撑订阅模式与商家订单对接。
+
+### 核心服务
+
+- **表情包生成服务**：针对网络冲浪者，根据电影视频/图片生成3-5个高质量表情包
+- **周边建模图生成服务**：针对周边制作商家，输出包含三视图、尺寸标注、材质建议的建模图
+- **订阅管理**：支撑产品订阅额度管理
+- **商家对接**：为商家提供订单对接入口
+
+## 技术栈
 
 - **Framework**: Next.js 16 (App Router)
 - **Core**: React 19
 - **Language**: TypeScript 5
 - **UI 组件**: shadcn/ui (基于 Radix UI)
 - **Styling**: Tailwind CSS 4
+- **图片生成**: coze-coding-dev-sdk (ImageGenerationClient)
 
 ## 目录结构
 
 ```
-├── public/                 # 静态资源
-├── scripts/                # 构建与启动脚本
-│   ├── build.sh            # 构建脚本
-│   ├── dev.sh              # 开发环境启动脚本
-│   ├── prepare.sh          # 预处理脚本
-│   └── start.sh            # 生产环境启动脚本
+├── public/                     # 静态资源
+├── scripts/                    # 构建与启动脚本
 ├── src/
-│   ├── app/                # 页面路由与布局
-│   ├── components/ui/      # Shadcn UI 组件库
-│   ├── hooks/              # 自定义 Hooks
-│   ├── lib/                # 工具库
-│   │   └── utils.ts        # 通用工具函数 (cn)
-│   └── server.ts           # 自定义服务端入口
-├── next.config.ts          # Next.js 配置
-├── package.json            # 项目依赖管理
-└── tsconfig.json           # TypeScript 配置
+│   ├── app/                    # 页面路由
+│   │   ├── api/               # API 路由
+│   │   │   ├── emoticon/      # 表情包生成API
+│   │   │   └── model/         # 周边建模图API
+│   │   ├── layout.tsx        # 根布局
+│   │   └── page.tsx          # 首页（服务选择）
+│   ├── components/            # 组件
+│   │   ├── service-select.tsx    # 服务类型选择
+│   │   ├── emoticon-generator.tsx # 表情包生成器
+│   │   ├── model-generator.tsx   # 建模图生成器
+│   │   ├── subscription-manager.tsx # 订阅管理
+│   │   └── merchant-connect.tsx   # 商家对接
+│   └── lib/                   # 工具库
+│       ├── config.ts         # 应用配置
+│       └── utils.ts          # 通用工具函数
 ```
 
-- 项目文件（如 app 目录、pages 目录、components 等）默认初始化到 `src/` 目录下。
+## 核心功能
 
-## 包管理规范
+### 1. 表情包生成
 
-**仅允许使用 pnpm** 作为包管理器，**严禁使用 npm 或 yarn**。
-**常用命令**：
-- 安装依赖：`pnpm add <package>`
-- 安装开发依赖：`pnpm add -D <package>`
-- 安装所有依赖：`pnpm install`
-- 移除依赖：`pnpm remove <package>`
+**输入**：
+- 电影视频片段（≤30秒）或图片（≥1080×1080）
+- 角色/场景指定（可选）
+
+**输出**：
+- 3-5个高质量表情包
+- 适配微信/抖音比例（1:1或4:3）
+- 保留角色核心特征
+- 简洁趣味文字（≤10字）
+
+**技术实现**：
+- 使用 ImageGenerationClient 生成基础图片
+- 应用图片处理生成多个表情包变体
+- 添加文字叠加和比例调整
+
+### 2. 周边建模图生成
+
+**输入**：
+- 电影视频片段或高清图片
+- 指定核心角色
+
+**输出**：
+- 三视图（正面/侧面/背面）
+- 关键尺寸标注（单位：cm）
+- 材质建议（树脂/毛绒等）
+- 细节说明（服饰纹理、配件形状）
+
+**技术实现**：
+- 分析图片提取角色特征
+- 生成三视图结构化描述
+- 生成标准化的建模参数文档
+
+### 3. 订阅管理
+
+- 订阅方案展示
+- 额度追踪（表情包生成次数、建模图生成次数）
+- 升级引导
+
+### 4. 商家对接
+
+- 商家资质收集
+- 订单入口
+- 供应链资源匹配
+
+## API 设计
+
+### POST /api/emoticon/generate
+生成表情包
+
+**Request**:
+```json
+{
+  "imageUrl": "string",      // 素材图片URL
+  "characterName": "string", // 角色名称（可选）
+  "sceneDescription": "string", // 场景描述（可选）
+  "count": 3-5              // 生成数量
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "emoticons": [
+    {
+      "id": "string",
+      "url": "string",
+      "caption": "string",
+      "platform": "wechat|douyin"
+    }
+  ]
+}
+```
+
+### POST /api/model/generate
+生成周边建模图
+
+**Request**:
+```json
+{
+  "imageUrl": "string",
+  "characterName": "string",
+  "material": "resin|plush|vinyl", // 材质偏好
+  "businessInfo": {  // 商家信息（可选）
+    "name": "string",
+    "scope": "string"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "model": {
+    "characterName": "string",
+    "views": {
+      "front": "string",  // 正面视图描述
+      "side": "string",   // 侧面视图描述
+      "back": "string"    // 背面视图描述
+    },
+    "dimensions": {
+      "height": "number (cm)",
+      "headDiameter": "number (cm)",
+      "chestWidth": "number (cm)"
+    },
+    "material": "string",
+    "details": "string"
+  }
+}
+```
+
+## 质量标准
+
+### 表情包
+- ✅ 画面清晰无模糊
+- ✅ 保留角色核心特征
+- ✅ 适配主流社交平台比例
+- ✅ 趣味文字简洁（≤10字）
+- ❌ 禁止低俗、违规文字
+- ❌ 禁止过度变形导致角色无法识别
+
+### 周边建模图
+- ✅ 包含三视图与尺寸标注
+- ✅ 严格依据用户提供的素材
+- ❌ 禁止虚构不存在的角色特征
+- ❌ 无标注视为不合格
 
 ## 开发规范
 
 ### Hydration 问题防范
+1. 严禁在 JSX 渲染逻辑中直接使用动态数据
+2. 必须使用 'use client' 并配合 useEffect + useState
+3. 严禁非法 HTML 嵌套
 
-1. 严禁在 JSX 渲染逻辑中直接使用 typeof window、Date.now()、Math.random() 等动态数据。**必须使用 'use client' 并配合 useEffect + useState 确保动态内容仅在客户端挂载后渲染**；同时严禁非法 HTML 嵌套（如 <p> 嵌套 <div>）。
-2. **禁止使用 head 标签**，优先使用 metadata，详见文档：https://nextjs.org/docs/app/api-reference/functions/generate-metadata
-   1. 三方 CSS、字体等资源可在 `globals.css` 中顶部通过 `@import` 引入或使用 next/font
-   2. preload, preconnect, dns-prefetch 通过 ReactDOM 的 preload、preconnect、dns-prefetch 方法引入
-   3. json-ld 可阅读 https://nextjs.org/docs/app/guides/json-ld
+### 图片生成规范
+- 使用 coze-coding-dev-sdk 的 ImageGenerationClient
+- 必须仅在服务端代码中使用 SDK
+- 使用 HeaderUtils.extractForwardHeaders 处理请求头
 
-## UI 设计与组件规范 (UI & Styling Standards)
+### 包管理
+**仅允许使用 pnpm**
+- 安装依赖：`pnpm add <package>`
+- 移除依赖：`pnpm remove <package>`
 
-- 模板默认预装核心组件库 `shadcn/ui`，位于`src/components/ui/`目录下
-- Next.js 项目**必须默认**采用 shadcn/ui 组件、风格和规范，**除非用户指定用其他的组件和规范。**
+## 部署说明
+
+- 开发环境：使用 `pnpm dev` 启动（端口 5000）
+- 生产环境：使用 `pnpm build && pnpm start`
+
+## 注意事项
+
+- 所有输出需关联用户提供的电影素材
+- 订阅额度限制优先于生成请求
+- 商家信息仅商家可获取完整参数
