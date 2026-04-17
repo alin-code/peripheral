@@ -49,40 +49,35 @@ function getRandomCaptions(platform: string, count: number): string[] {
   return shuffled.slice(0, count);
 }
 
-// 从base64提取MIME类型
-function extractMimeType(base64Data: string): string | null {
-  const match = base64Data.match(/^data:image\/(\w+);base64,/);
-  return match ? `image/${match[1]}` : null;
-}
-
-// 从base64提取纯数据部分
-function extractBase64Data(base64Data: string): string {
-  return base64Data.replace(/^data:image\/\w+;base64,/, '');
-}
-
 // 生成提示词
 function generatePrompt(characterName?: string, sceneDescription?: string, isReference = false): string {
-  let prompt = '';
-  
-  if (isReference) {
-    prompt = 'Based on the reference image, ';
-  }
-  
-  prompt += 'High quality emoticon/sticker for messaging app, ';
-  
+  const details: string[] = [];
+
   if (characterName) {
-    prompt += `character "${characterName}", `;
+    details.push(`角色名称：${characterName}`);
   }
-  
+
   if (sceneDescription) {
-    prompt += `${sceneDescription}, `;
+    details.push(`用户需求：${sceneDescription}`);
   }
-  
-  prompt += 'exaggerated expression, clear image, white or transparent background, ';
-  prompt += 'vibrant colors, cartoon style, clean lines, ';
-  prompt += 'without text overlay, multiple variations';
-  
-  return prompt;
+
+  const promptParts = [
+    isReference
+      ? 'Based on the reference image, create a high-quality Chinese emoticon/sticker image.'
+      : 'Create a high-quality Chinese emoticon/sticker image.',
+    'Keep the character identity, facial features, hairstyle, clothing, and pose recognizable.',
+    'Highlight the person’s expression, emotion, and action.',
+    'Add a short funny Chinese meme caption, 2-10 Chinese characters.',
+    'The caption should match the user intent and social chat usage.',
+    'Meme sticker style, clean composition, simple background, vivid colors, clear readable text.',
+    'Slightly exaggerated but still recognizable, expressive, social-media-ready, no watermark.',
+  ];
+
+  if (details.length > 0) {
+    promptParts.push(details.join('，'));
+  }
+
+  return promptParts.join(' ');
 }
 
 // 表情包生成API
@@ -124,11 +119,11 @@ export async function POST(request: NextRequest) {
     
     // 生成不同表情变体的提示词
     const emotionVariations = [
-      'surprised expression, wide eyes, open mouth, shocked',
-      'happy expression, big smile, closed eyes, joyful',
-      'funny expression, messed up hair, silly face',
-      'speechless expression, flat mouth, sweat drops',
-      'angry expression, furrowed brows, frustrated'
+      'Variation 1: shocked reaction, wide eyes, dramatic surprise, funny meme tone.',
+      'Variation 2: cheerful reaction, big smile, relaxed and playful mood.',
+      'Variation 3: awkward funny reaction, goofy face, strong meme feeling.',
+      'Variation 4: speechless reaction, flat expression, subtle helpless humor.',
+      'Variation 5: frustrated reaction, annoyed face, exaggerated emotional tension.'
     ];
 
     // 生成多个表情包

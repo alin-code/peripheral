@@ -46,6 +46,42 @@ const MATERIAL_SUGGESTIONS = {
   }
 };
 
+function generateModelPrompt({
+  characterName,
+  material,
+  scale,
+  businessInfo,
+}: {
+  characterName: string;
+  material: keyof typeof MATERIAL_SUGGESTIONS;
+  scale: string;
+  businessInfo?: ModelRequest['businessInfo'];
+}) {
+  const materialInfo = MATERIAL_SUGGESTIONS[material] || MATERIAL_SUGGESTIONS.mixed;
+  const businessNotes = [
+    businessInfo?.name ? `商家名称：${businessInfo.name}` : '',
+    businessInfo?.scope ? `业务方向：${businessInfo.scope}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  return [
+    `Based on the reference image, create a high-quality toy figure model sheet for the character "${characterName}".`,
+    'Keep the character identity, facial features, hairstyle, clothing silhouette, accessories, and proportions recognizable.',
+    'Generate a clean professional turnaround sheet showing front view, side view, and back view in one composition.',
+    'Use a centered three-view layout, white or very light neutral background, strong contour clarity, consistent lighting, and production-friendly presentation.',
+    'The character should look like a manufacturable collectible figure or statue reference, with clear costume structure and readable shape breakdown.',
+    'Do not add decorative background elements, cinematic scene effects, watermark, logo, or unrelated props.',
+    'Do not add measurement labels, paragraphs, UI panels, or extra design boards.',
+    'Style: polished model sheet, product concept art, precise silhouette, high detail, clear edges, realistic material separation, studio presentation.',
+    `Preferred material direction: ${materialInfo.name}. Material note: ${materialInfo.description}.`,
+    `Target collectible scale: ${scale}.`,
+    businessNotes,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
 // 生成建模图描述
 function generateModelDescription(characterName: string): {
   front: string;
@@ -119,11 +155,12 @@ export async function POST(request: NextRequest) {
     }
 
     // 生成建模参考图 - 使用参考图片
-    const modelPrompt = `Based on the reference image of character "${characterName}", 
-      create a professional 3D model reference sheet for toy figure production,
-      clean white background, front view, side view, back view, three-angle layout,
-      technical illustration style, detailed measurements,
-      no text, no watermark, high contrast outlines, maintain character features`;
+    const modelPrompt = generateModelPrompt({
+      characterName,
+      material,
+      scale,
+      businessInfo,
+    });
 
     console.log('正在生成建模图，使用参考图片:', referenceImage ? '是' : '否');
 
