@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import { createUser, findUserByEmail } from '@/lib/user-repository';
+import { verifyTurnstileToken } from '@/lib/turnstile';
 
 interface SignUpRequest {
   email: string;
   password: string;
   username?: string;
+  turnstileToken?: string;
 }
 
 // 邮箱格式验证
@@ -35,7 +37,7 @@ function isValidPassword(password: string): { valid: boolean; message: string } 
 export async function POST(request: NextRequest) {
   try {
     const body: SignUpRequest = await request.json();
-    const { email, password, username } = body;
+    const { email, password, username, turnstileToken } = body;
 
     // 参数验证
     if (!email || !password) {
@@ -66,6 +68,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: '服务配置错误，请联系管理员' },
         { status: 500 }
+      );
+    }
+
+    if (!turnstileToken) {
+      return NextResponse.json(
+        { success: false, error: '请先完成人机验证' },
+        { status: 400 }
+      );
+    }
+
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const remoteIp = forwardedFor?.split(',')[0]?.trim() || null;
+    const turnstileResult = await verifyTurnstileToken(turnstileToken, remoteIp);
+    if (!turnstileResult.success) {
+      return NextResponse.json(
+        { success: false, error: turnstileResult.error },
+        { status: 400 }
       );
     }
 

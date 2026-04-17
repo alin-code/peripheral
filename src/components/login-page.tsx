@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +33,11 @@ interface FormErrors {
   general?: string;
 }
 
+const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
 export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
+  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+
   // 登录表单状态
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -48,6 +53,8 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [signupError, setSignupError] = useState('');
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [turnstileWidgetKey, setTurnstileWidgetKey] = useState(0);
 
   // 验证邮箱格式
   const isValidEmail = (email: string): boolean => {
@@ -70,6 +77,21 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
       return { valid: false, message: '密码需包含至少一个数字' };
     }
     return { valid: true, message: '' };
+  };
+
+  const resetTurnstile = () => {
+    setTurnstileToken('');
+    setTurnstileWidgetKey(prev => prev + 1);
+  };
+
+  const switchToLogin = (email?: string, message?: string) => {
+    if (email) {
+      setLoginEmail(email);
+    }
+    if (message) {
+      setLoginError(message);
+    }
+    setActiveTab('login');
   };
 
   // 处理登录
@@ -141,6 +163,16 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
       return;
     }
 
+    if (!turnstileSiteKey) {
+      setSignupError('验证码配置缺失，请联系管理员');
+      return;
+    }
+
+    if (!turnstileToken) {
+      setSignupError('请先完成人机验证');
+      return;
+    }
+
     setIsSigningUp(true);
 
     try {
@@ -150,7 +182,8 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
         body: JSON.stringify({
           email: signupEmail,
           password: signupPassword,
-          username: signupUsername || undefined
+          username: signupUsername || undefined,
+          turnstileToken
         })
       });
 
@@ -160,13 +193,21 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
         setSignupSuccess(true);
         // 3秒后自动切换到登录
         setTimeout(() => {
-          document.querySelector<HTMLButtonElement>('[value="login"]')?.click();
+          switchToLogin(signupEmail, '注册成功，请使用刚刚创建的账号登录');
         }, 3000);
       } else {
+        if (response.status === 409 || data.error === '该邮箱已被注册') {
+          switchToLogin(signupEmail, '该邮箱已注册，请直接登录');
+          resetTurnstile();
+          return;
+        }
+
         setSignupError(data.error || '注册失败');
+        resetTurnstile();
       }
     } catch (error) {
       setSignupError('网络错误，请稍后重试');
+      resetTurnstile();
     } finally {
       setIsSigningUp(false);
     }
@@ -205,7 +246,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
 
         {/* Auth Card */}
         <Card className="w-full max-w-md shadow-xl">
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'signup')} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">登录</TabsTrigger>
               <TabsTrigger value="signup">注册</TabsTrigger>
@@ -416,10 +457,34 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                       </div>
                     )}
 
+                    <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-900/40">
+                      {turnstileSiteKey ? (
+                        <Turnstile
+                          key={turnstileWidgetKey}
+                          siteKey={turnstileSiteKey}
+                          onSuccess={(token) => {
+                            setSignupError('');
+                            setTurnstileToken(token);
+                          }}
+                          onExpire={() => {
+                            setTurnstileToken('');
+                          }}
+                          onError={() => {
+                            setTurnstileToken('');
+                            setSignupError('人机验证加载失败，请刷新后重试');
+                          }}
+                        />
+                      ) : (
+                        <p className="text-sm text-amber-600 dark:text-amber-400">
+                          验证码配置缺失，请联系管理员处理
+                        </p>
+                      )}
+                    </div>
+
                     {/* Submit */}
                     <Button
                       type="submit"
-                      disabled={isSigningUp}
+                      disabled={isSigningUp || !turnstileToken}
                       className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
                     >
                       {isSigningUp ? (
