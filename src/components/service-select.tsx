@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,33 +11,71 @@ import {
   Shield, 
   Clock,
   Sparkles,
-  Users
+  Users,
+  User,
+  LogOut
 } from 'lucide-react';
 
 interface ServiceSelectProps {
   onSelectService: (service: 'emoticon' | 'model') => void;
+  onLogin?: () => void;
+  currentUser?: { id: string; email: string; username?: string } | null;
+  onLogout?: () => void;
 }
 
-export default function ServiceSelect({ onSelectService }: ServiceSelectProps) {
+export default function ServiceSelect({ onSelectService, onLogin, currentUser, onLogout }: ServiceSelectProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-6">
-            <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-              AI智能生成服务
-            </span>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex-1 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-6">
+              <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                AI智能生成服务
+              </span>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+              电影周边建模与表情包定制
+            </h1>
+            
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              基于你喜爱的电影角色，AI智能生成高质量表情包和周边建模图
+            </p>
           </div>
-          
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-            电影周边建模与表情包定制
-          </h1>
-          
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            基于你喜爱的电影角色，AI智能生成高质量表情包和周边建模图
-          </p>
+
+          {/* User Section */}
+          <div className="absolute top-8 right-8 flex items-center gap-3">
+            {currentUser ? (
+              <>
+                <div className="flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-md">
+                  <User className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {currentUser.username || currentUser.email}
+                  </span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={onLogout}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  退出
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={onLogin}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              >
+                <User className="w-4 h-4 mr-2" />
+                登录/注册
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Service Cards */}
@@ -181,15 +220,21 @@ export default function ServiceSelect({ onSelectService }: ServiceSelectProps) {
 
         {/* Subscription Hint */}
         <div className="mt-12 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            💡 提示：当前为免费试用额度，生成次数有限
-          </p>
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-md">
             <span className="text-sm text-gray-700 dark:text-gray-300">
               已用额度：
             </span>
             <Badge className="bg-purple-500">表情包 0/10</Badge>
             <Badge className="bg-blue-500">建模图 0/5</Badge>
+            {!currentUser && (
+              <Button 
+                variant="link" 
+                className="text-sm text-purple-600 p-0 h-auto ml-2"
+                onClick={onLogin}
+              >
+                登录获取更多额度 →
+              </Button>
+            )}
           </div>
         </div>
       </div>
