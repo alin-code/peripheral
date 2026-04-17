@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ImageGenerationClient, Config, HeaderUtils } from 'coze-coding-dev-sdk';
+import { requestArkImageGeneration } from '@/lib/ark';
 
 interface ModelRequest {
   imageUrl?: string;
@@ -109,13 +109,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 提取请求头
-    const customHeaders = HeaderUtils.extractForwardHeaders(request.headers);
-
-    // 初始化图片生成客户端
-    const config = new Config();
-    const client = new ImageGenerationClient(config, customHeaders);
-
     // 处理图片输入
     let referenceImage: string | string[] | undefined;
     
@@ -134,14 +127,15 @@ export async function POST(request: NextRequest) {
 
     console.log('正在生成建模图，使用参考图片:', referenceImage ? '是' : '否');
 
-    const response = await client.generate({
+    const response = await requestArkImageGeneration({
       prompt: modelPrompt,
       size: '4K',
       image: referenceImage,
       watermark: false
     });
-
-    const helper = client.getResponseHelper(response);
+    const imageUrls = response.data
+      .filter((item) => !item.error && item.url)
+      .map((item) => item.url as string);
 
     // 生成建模参数文档
     const descriptions = generateModelDescription(characterName);
@@ -153,7 +147,7 @@ export async function POST(request: NextRequest) {
       model: {
         characterName,
         scale,
-        referenceImage: helper.success && helper.imageUrls.length > 0 ? helper.imageUrls[0] : null,
+        referenceImage: imageUrls.length > 0 ? imageUrls[0] : null,
         views: descriptions,
         dimensions: {
           高度: `${dimensions.height}cm`,

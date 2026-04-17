@@ -7,11 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScannerCardStream } from '@/components/ui/scanner-card-stream';
 import { 
   ArrowLeft, 
-  Loader2, 
   CheckCircle2,
   Box,
   Ruler,
@@ -77,6 +76,11 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
   const [progress, setProgress] = useState(0);
   const [modelData, setModelData] = useState<ModelData | null>(null);
   const [error, setError] = useState('');
+  const loadingCardImages = uploadedFile?.preview
+    ? [uploadedFile.preview]
+    : imageUrl
+      ? [imageUrl]
+      : undefined;
 
   const materialOptions = [
     { value: 'resin', name: 'PVC软胶/ABS树脂', desc: '精细雕刻，高端定位' },
@@ -168,7 +172,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
           <Button 
             variant="ghost" 
             onClick={onBack}
-            className="mb-4"
+            className="mb-4 text-gray-700 hover:bg-white/70"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             返回服务选择
@@ -178,12 +182,12 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
             <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
               <Box className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               周边建模图生成
             </h1>
           </div>
           <p className="text-gray-600 dark:text-gray-300">
-            为周边制作商家输出标准建模图，包含三视图、尺寸标注、材质建议
+            输出三视图与建模说明
           </p>
         </div>
 
@@ -194,20 +198,24 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
             <Card>
               <CardHeader>
                 <CardTitle>基础信息</CardTitle>
-                <CardDescription>
-                  提供角色素材和基本信息用于建模
-                </CardDescription>
+                <CardDescription>上传素材并填写角色信息</CardDescription>
               </CardHeader>
               
               <CardContent className="space-y-6">
                 {/* Image Input */}
                 <Tabs value={inputMode} onValueChange={(v) => setInputMode(v as 'upload' | 'url')}>
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="upload" className="gap-2">
+                  <TabsList className="grid w-full grid-cols-2 rounded-xl bg-[#dfeaf1] p-1.5">
+                    <TabsTrigger
+                      value="upload"
+                      className="gap-2 rounded-lg border border-transparent text-sm font-semibold text-[#4b5f6a] data-[state=active]:border-[#103c52] data-[state=active]:bg-[#154964] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(21,73,100,0.18)]"
+                    >
                       <Sparkles className="w-4 h-4" />
                       本地上传
                     </TabsTrigger>
-                    <TabsTrigger value="url" className="gap-2">
+                    <TabsTrigger
+                      value="url"
+                      className="gap-2 rounded-lg border border-transparent text-sm font-semibold text-[#4b5f6a] data-[state=active]:border-[#0f5c78] data-[state=active]:bg-[#0e7490] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(14,116,144,0.18)]"
+                    >
                       <Link className="w-4 h-4" />
                       图片链接
                     </TabsTrigger>
@@ -279,7 +287,11 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                         key={option.value}
                         variant={material === option.value ? 'default' : 'outline'}
                         onClick={() => setMaterial(option.value as typeof material)}
-                        className={material === option.value ? 'bg-blue-500 hover:bg-blue-600' : ''}
+                        className={
+                          material === option.value
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700'
+                        }
                         size="sm"
                       >
                         <Palette className="w-4 h-4 mr-1" />
@@ -301,7 +313,11 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                         key={option.value}
                         variant={scale === option.value ? 'default' : 'outline'}
                         onClick={() => setScale(option.value as typeof scale)}
-                        className={scale === option.value ? 'bg-cyan-500 hover:bg-cyan-600' : ''}
+                        className={
+                          scale === option.value
+                            ? 'bg-cyan-600 text-white hover:bg-cyan-700'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-700'
+                        }
                       >
                         <Ruler className="w-4 h-4 mr-1" />
                         {option.value}
@@ -324,9 +340,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                       <Building2 className="w-5 h-5" />
                       商家信息（可选）
                     </CardTitle>
-                    <CardDescription>
-                      完善商家信息可获取更多技术支持
-                    </CardDescription>
+                    <CardDescription>可选填写</CardDescription>
                   </div>
                   <Button
                     variant={isMerchant ? 'default' : 'outline'}
@@ -373,7 +387,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
 
                   <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <p className="text-sm text-blue-700 dark:text-blue-400">
-                      完善商家信息后，我们将为你匹配供应链资源并提供订单对接服务
+                      可用于后续商家对接
                     </p>
                   </div>
                 </CardContent>
@@ -384,14 +398,11 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
             <Button
               onClick={handleGenerate}
               disabled={isGenerating || !characterName || (!uploadedFile && !imageUrl)}
-              className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+              className="w-full border border-cyan-300/40 bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold text-white shadow-[0_12px_30px_rgba(37,99,235,0.22)] hover:from-blue-700 hover:to-cyan-600"
               size="lg"
             >
               {isGenerating ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  正在生成建模图...
-                </>
+                <>正在生成建模图...</>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
@@ -399,17 +410,6 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                 </>
               )}
             </Button>
-
-            {/* Progress */}
-            {isGenerating && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">生成进度</span>
-                  <span className="text-blue-600">{progress}%</span>
-                </div>
-                <Progress value={progress} className="h-2" />
-              </div>
-            )}
 
             {/* Error */}
             {error && (
@@ -427,24 +427,43 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                 建模图输出
               </CardTitle>
               <CardDescription>
-                {modelData 
-                  ? '建模图已生成，可直接用于生产'
-                  : '点击生成后将在这里展示标准建模文档'
+                {isGenerating
+                  ? '正在解析角色结构并生成建模说明'
+                  : modelData 
+                  ? '建模图已生成'
+                  : '结果会显示在这里'
                 }
               </CardDescription>
             </CardHeader>
             
             <CardContent>
-              {!modelData ? (
+              {isGenerating ? (
+                <div className="space-y-5">
+                  <ScannerCardStream
+                    height={320}
+                    cardImages={loadingCardImages}
+                    repeat={6}
+                    initialSpeed={165}
+                    className="rounded-[30px]"
+                  />
+
+                  <div className="rounded-2xl border border-cyan-200/50 bg-gradient-to-r from-blue-50 via-white to-cyan-50 p-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-gray-700">生成进度</span>
+                      <span className="font-semibold text-cyan-600">{progress}%</span>
+                    </div>
+                    <p className="mt-2 text-sm text-gray-500">
+                      正在分析三视图、尺寸比例与材质建议，请稍候。
+                    </p>
+                  </div>
+                </div>
+              ) : !modelData ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
                     <Box className="w-8 h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-500 dark:text-gray-400">
                     暂无建模图
-                  </p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                    请填写信息并点击生成按钮
                   </p>
                 </div>
               ) : (

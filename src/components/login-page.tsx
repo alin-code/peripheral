@@ -221,7 +221,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
           <Button 
             variant="ghost" 
             onClick={onBack}
-            className="absolute top-8 left-8"
+            className="absolute top-8 left-8 text-gray-700 hover:bg-white/70"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             返回
@@ -240,16 +240,26 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
             欢迎回来
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            登录或注册账号开始使用
+            登录或注册
           </p>
         </div>
 
         {/* Auth Card */}
         <Card className="w-full max-w-md shadow-xl">
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'signup')} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">登录</TabsTrigger>
-              <TabsTrigger value="signup">注册</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 rounded-none rounded-t-xl bg-[#efe3dc] p-1.5">
+              <TabsTrigger
+                value="login"
+                className="rounded-lg border border-transparent font-semibold text-[#6a5750] data-[state=active]:border-[#2d2220] data-[state=active]:bg-[#1c1413] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(28,20,19,0.18)]"
+              >
+                登录
+              </TabsTrigger>
+              <TabsTrigger
+                value="signup"
+                className="rounded-lg border border-transparent font-semibold text-[#6a5750] data-[state=active]:border-[#4f3596] data-[state=active]:bg-[#7c3aed] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(124,58,237,0.2)]"
+              >
+                注册
+              </TabsTrigger>
             </TabsList>
 
             {/* Login Tab */}
@@ -259,9 +269,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                   <Mail className="w-5 h-5" />
                   登录账号
                 </CardTitle>
-                <CardDescription>
-                  输入你的邮箱和密码登录
-                </CardDescription>
+                <CardDescription>输入邮箱和密码</CardDescription>
               </CardHeader>
               
               <CardContent>
@@ -317,7 +325,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                   <Button
                     type="submit"
                     disabled={isLoggingIn}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    className="w-full border border-purple-300/40 bg-gradient-to-r from-purple-600 to-pink-500 font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.22)] hover:from-purple-700 hover:to-pink-600"
                   >
                     {isLoggingIn ? (
                       <>
@@ -339,9 +347,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                   <User className="w-5 h-5" />
                   注册账号
                 </CardTitle>
-                <CardDescription>
-                  创建一个新账号（邮箱作为用户名）
-                </CardDescription>
+                <CardDescription>创建新账号</CardDescription>
               </CardHeader>
               
               <CardContent>
@@ -485,7 +491,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                     <Button
                       type="submit"
                       disabled={isSigningUp || !turnstileToken}
-                      className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                      className="w-full border border-cyan-300/40 bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold text-white shadow-[0_12px_30px_rgba(37,99,235,0.22)] hover:from-blue-700 hover:to-cyan-600"
                     >
                       {isSigningUp ? (
                         <>
@@ -505,7 +511,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
 
         {/* Footer */}
         <p className="text-center text-sm text-gray-500 mt-6">
-          登录即表示同意我们的{' '}
+          登录即表示同意{' '}
           <a href="#" className="text-purple-600 hover:underline">服务条款</a>
           {' '}和{' '}
           <a href="#" className="text-purple-600 hover:underline">隐私政策</a>

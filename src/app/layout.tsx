@@ -68,6 +68,17 @@ export default function RootLayout({
       <body className={`antialiased`}>
         {isDev && <Inspector />}
         {children}
+        <div className="pointer-events-none fixed bottom-4 right-4 z-50 max-w-[calc(100vw-2rem)]">
+          <div className="pointer-events-auto rounded-full border border-white/12 bg-black/65 px-4 py-2 text-xs text-white/78 shadow-lg backdrop-blur-xl">
+            问题反馈请发送邮件到：
+            <a
+              href="mailto:feedback@peripheral-cyan.vercel.app"
+              className="ml-1 text-amber-200 hover:text-amber-100"
+            >
+              feedback@peripheral-cyan.vercel.app
+            </a>
+          </div>
+        </div>
       </body>
     </html>
   );

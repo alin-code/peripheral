@@ -8,11 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScannerCardStream } from '@/components/ui/scanner-card-stream';
 import { 
   ArrowLeft, 
-  Loader2, 
   Download, 
   CheckCircle2,
   MessageCircle,
@@ -51,6 +50,11 @@ export default function EmoticonGenerator({
   const [progress, setProgress] = useState(0);
   const [emoticons, setEmoticons] = useState<Emoticon[]>([]);
   const [error, setError] = useState('');
+  const loadingCardImages = uploadedFile?.preview
+    ? [uploadedFile.preview]
+    : imageUrl
+      ? [imageUrl]
+      : undefined;
 
   const handleFileSelect = (file: File, previewUrl: string) => {
     setUploadedFile({ preview: previewUrl, name: file.name });
@@ -146,7 +150,7 @@ export default function EmoticonGenerator({
           <Button 
             variant="ghost" 
             onClick={onBack}
-            className="mb-4"
+            className="mb-4 text-gray-700 hover:bg-white/70"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             返回服务选择
@@ -156,12 +160,12 @@ export default function EmoticonGenerator({
             <div className="p-2 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg">
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               电影表情包生成
             </h1>
           </div>
           <p className="text-gray-600 dark:text-gray-300">
-            上传电影素材，AI为你生成3-5个高质量表情包
+            上传素材并生成表情包
           </p>
         </div>
 
@@ -170,20 +174,24 @@ export default function EmoticonGenerator({
           <Card>
             <CardHeader>
               <CardTitle>素材上传</CardTitle>
-              <CardDescription>
-                提供电影图片，AI将提取核心画面生成表情包
-              </CardDescription>
+              <CardDescription>支持上传或粘贴链接</CardDescription>
             </CardHeader>
             
             <CardContent className="space-y-6">
               {/* Input Mode Tabs */}
               <Tabs value={inputMode} onValueChange={(v) => setInputMode(v as 'upload' | 'url')}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="upload" className="gap-2">
+                <TabsList className="grid h-auto w-full grid-cols-2 rounded-2xl border border-[#e2d4cb] bg-[#eaded7] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+                  <TabsTrigger
+                    value="upload"
+                    className="h-11 gap-2 rounded-xl border border-transparent text-sm font-semibold text-[#5f514c] data-[state=active]:border-[#2b201d] data-[state=active]:bg-[#1d1413] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(29,20,19,0.18)]"
+                  >
                     <Sparkles className="w-4 h-4" />
                     本地上传
                   </TabsTrigger>
-                  <TabsTrigger value="url" className="gap-2">
+                  <TabsTrigger
+                    value="url"
+                    className="h-11 gap-2 rounded-xl border border-transparent text-sm font-semibold text-[#5f514c] data-[state=active]:border-[#4a342d] data-[state=active]:bg-[#3a2a25] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(58,42,37,0.18)]"
+                  >
                     <Link className="w-4 h-4" />
                     图片链接
                   </TabsTrigger>
@@ -217,9 +225,7 @@ export default function EmoticonGenerator({
                       />
                       <Link className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     </div>
-                    <p className="text-xs text-gray-500">
-                      支持JPG/PNG/WebP，建议分辨率≥1080×1080
-                    </p>
+                    <p className="text-xs text-gray-500">建议高清图片</p>
                   </div>
                   
                   {/* URL Preview */}
@@ -249,7 +255,7 @@ export default function EmoticonGenerator({
                   onChange={(e) => setCharacterName(e.target.value)}
                 />
                 <p className="text-xs text-gray-500">
-                  指定角色可确保表情包精准还原角色特征
+                  可选填写
                 </p>
               </div>
 
@@ -272,7 +278,11 @@ export default function EmoticonGenerator({
                   <Button
                     variant={platform === 'wechat' ? 'default' : 'outline'}
                     onClick={() => setPlatform('wechat')}
-                    className={platform === 'wechat' ? 'bg-green-500 hover:bg-green-600' : ''}
+                    className={
+                      platform === 'wechat'
+                        ? 'border-green-600 bg-green-600 text-white shadow-sm hover:bg-green-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-green-500 hover:bg-green-50 hover:text-green-700'
+                    }
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     微信
@@ -280,7 +290,11 @@ export default function EmoticonGenerator({
                   <Button
                     variant={platform === 'douyin' ? 'default' : 'outline'}
                     onClick={() => setPlatform('douyin')}
-                    className={platform === 'douyin' ? 'bg-black hover:bg-gray-800' : ''}
+                    className={
+                      platform === 'douyin'
+                        ? 'border-black bg-black text-white shadow-sm hover:bg-gray-900'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-black hover:bg-gray-100 hover:text-black'
+                    }
                   >
                     <Instagram className="w-4 h-4 mr-2" />
                     抖音
@@ -288,7 +302,11 @@ export default function EmoticonGenerator({
                   <Button
                     variant={platform === 'both' ? 'default' : 'outline'}
                     onClick={() => setPlatform('both')}
-                    className={platform === 'both' ? 'bg-purple-500 hover:bg-purple-600' : ''}
+                    className={
+                      platform === 'both'
+                        ? 'border-purple-600 bg-purple-600 text-white shadow-sm hover:bg-purple-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-purple-500 hover:bg-purple-50 hover:text-purple-700'
+                    }
                   >
                     双平台
                   </Button>
@@ -299,14 +317,11 @@ export default function EmoticonGenerator({
               <Button
                 onClick={handleGenerate}
                 disabled={isGenerating || (!uploadedFile && !imageUrl)}
-                className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                className="w-full border border-pink-300/40 bg-gradient-to-r from-pink-500 to-purple-500 font-semibold text-white shadow-[0_12px_30px_rgba(191,90,242,0.22)] hover:from-pink-600 hover:to-purple-600"
                 size="lg"
               >
                 {isGenerating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    正在生成...
-                  </>
+                  <>正在生成...</>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
@@ -314,17 +329,6 @@ export default function EmoticonGenerator({
                   </>
                 )}
               </Button>
-
-              {/* Progress */}
-              {isGenerating && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">生成进度</span>
-                    <span className="text-purple-600">{progress}%</span>
-                  </div>
-                  <Progress value={progress} className="h-2" />
-                </div>
-              )}
 
               {/* Error */}
               {error && (
@@ -336,13 +340,11 @@ export default function EmoticonGenerator({
               {/* Tips */}
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">
-                  生成技巧
+                  提示
                 </h4>
                 <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
-                  <li>• 支持拖拽上传本地文件</li>
-                  <li>• 提供高清原图效果更佳</li>
-                  <li>• 明确角色名称可保留特征</li>
-                  <li>• 生成后可下载PNG格式使用</li>
+                  <li>• 高清原图效果更好</li>
+                  <li>• 可下载 PNG</li>
                 </ul>
               </div>
             </CardContent>
@@ -353,24 +355,43 @@ export default function EmoticonGenerator({
             <CardHeader>
               <CardTitle>生成结果</CardTitle>
               <CardDescription>
-                {emoticons.length > 0 
+                {isGenerating
+                  ? '正在解析素材并生成表情包'
+                  : emoticons.length > 0 
                   ? `已生成 ${emoticons.length} 个表情包`
-                  : '点击生成后将在这里展示结果'
+                  : '结果会显示在这里'
                 }
               </CardDescription>
             </CardHeader>
             
             <CardContent>
-              {emoticons.length === 0 ? (
+              {isGenerating ? (
+                <div className="space-y-5">
+                  <ScannerCardStream
+                    height={320}
+                    cardImages={loadingCardImages}
+                    repeat={6}
+                    initialSpeed={170}
+                    className="rounded-[30px]"
+                  />
+
+                  <div className="rounded-2xl border border-purple-200/50 bg-gradient-to-r from-pink-50 via-white to-purple-50 p-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-gray-700">生成进度</span>
+                      <span className="font-semibold text-purple-600">{progress}%</span>
+                    </div>
+                    <p className="mt-2 text-sm text-gray-500">
+                      正在提取角色特征、组合文案并生成多张适配图。
+                    </p>
+                  </div>
+                </div>
+              ) : emoticons.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
                     <MessageCircle className="w-8 h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-500 dark:text-gray-400">
                     暂无生成结果
-                  </p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                    请上传素材并点击生成按钮
                   </p>
                 </div>
               ) : (
@@ -416,11 +437,11 @@ export default function EmoticonGenerator({
                         {/* Download Button */}
                         <Button
                           variant="outline"
-                          size="icon"
                           onClick={() => downloadImage(emoticon)}
-                          className="flex-shrink-0"
+                          className="flex-shrink-0 rounded-xl border-[#2e221f] bg-[#2a1d1a] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(42,29,26,0.2)] hover:border-[#1d1413] hover:bg-[#1d1413]"
                         >
-                          <Download className="w-4 h-4" />
+                          <Download className="mr-2 h-4 w-4" />
+                          下载
                         </Button>
                       </div>
                     </div>
@@ -442,12 +463,11 @@ export default function EmoticonGenerator({
                   {/* Platform适配说明 */}
                   <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                     <h4 className="font-medium text-purple-900 dark:text-purple-300 mb-2">
-                      平台适配说明
+                      平台说明
                     </h4>
                     <div className="space-y-2 text-sm text-purple-700 dark:text-purple-400">
-                      <p><strong>微信：</strong>1:1正方形，≤500KB，支持PNG/APNG</p>
-                      <p><strong>抖音：</strong>推荐1:1或9:16，≤2MB，支持PNG/MP4</p>
-                      <p>所有生成的表情包均已优化至平台标准比例</p>
+                      <p><strong>微信：</strong>1:1</p>
+                      <p><strong>抖音：</strong>1:1 / 9:16</p>
                     </div>
                   </div>
                 </div>
@@ -460,12 +480,12 @@ export default function EmoticonGenerator({
         <div className="mt-8 text-center">
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-md">
             <span className="text-sm text-gray-700 dark:text-gray-300">
-              当前订阅额度：
+              当前额度：
             </span>
             <Badge className="bg-pink-500">表情包 1/10</Badge>
             <span className="text-sm text-gray-500">|</span>
             <Button variant="link" className="text-sm text-purple-600 p-0 h-auto">
-              升级解锁更多额度 →
+              升级 →
             </Button>
           </div>
         </div>

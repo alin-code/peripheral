@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ImageGenerationClient, Config, HeaderUtils } from 'coze-coding-dev-sdk';
 
 // 文件大小限制 10MB
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -63,42 +62,15 @@ export async function POST(request: NextRequest) {
     }
 
     const newFilename = generateFilename(filename);
-    
-    // 提取请求头
-    const customHeaders = HeaderUtils.extractForwardHeaders(request.headers);
-    const config = new Config();
-    const client = new ImageGenerationClient(config, customHeaders);
 
-    // 直接使用 base64 数据生成图片
-    const response = await client.generate({
-      prompt: 'Generate reference image from uploaded content',
-      size: '2K',
-      responseFormat: 'b64_json'
+    return NextResponse.json({
+      success: true,
+      message: '图片上传成功',
+      imageData: `data:${mimeType};base64,${base64Data}`,
+      filename: newFilename,
+      size: bufferSize,
+      mimeType: mimeType
     });
-
-    const helper = client.getResponseHelper(response);
-
-    if (helper.success) {
-      // 返回上传成功的信息和图片URL
-      return NextResponse.json({
-        success: true,
-        message: '图片上传成功',
-        imageUrl: helper.imageUrls[0] || null,
-        filename: newFilename,
-        size: bufferSize,
-        mimeType: mimeType
-      });
-    } else {
-      // 如果图片生成失败，返回base64数据作为临时URL
-      return NextResponse.json({
-        success: true,
-        message: '图片处理中',
-        imageData: `data:${mimeType};base64,${base64Data}`,
-        filename: newFilename,
-        size: bufferSize,
-        mimeType: mimeType
-      });
-    }
 
   } catch (error) {
     console.error('文件上传错误:', error);

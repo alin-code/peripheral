@@ -1,19 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  MessageCircle, 
-  Box, 
-  Zap, 
-  Shield, 
-  Clock,
+import { Button } from '@/components/ui/button';
+import HeroSection from '@/components/ui/glassmorphism-trust-hero';
+import {
+  MessageCircle,
+  Box,
+  ArrowRight,
   Sparkles,
-  Users,
-  User,
-  LogOut
+  Shield,
+  Clock,
 } from 'lucide-react';
 
 interface ServiceSelectProps {
@@ -23,220 +19,130 @@ interface ServiceSelectProps {
   onLogout?: () => void;
 }
 
-export default function ServiceSelect({ onSelectService, onLogin, currentUser, onLogout }: ServiceSelectProps) {
+export default function ServiceSelect({
+  onSelectService,
+  onLogin,
+  currentUser,
+  onLogout,
+}: ServiceSelectProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
-      <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex-1 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-6">
-              <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                AI智能生成服务
-              </span>
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-              电影周边建模与表情包定制
-            </h1>
-            
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              基于你喜爱的电影角色，AI智能生成高质量表情包和周边建模图
-            </p>
-          </div>
+    <div className="min-h-screen bg-zinc-950 text-white">
+      <HeroSection
+        currentUser={currentUser}
+        onLogin={onLogin}
+        onLogout={onLogout}
+        onCreateEmoticon={() => onSelectService('emoticon')}
+        onCreateModel={() => onSelectService('model')}
+      />
 
-          {/* User Section */}
-          <div className="absolute top-8 right-8 flex items-center gap-3">
-            {currentUser ? (
-              <>
-                <div className="flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-md">
-                  <User className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {currentUser.username || currentUser.email}
-                  </span>
+      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <section className="grid gap-6 lg:grid-cols-2">
+            <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(160deg,rgba(255,240,222,0.1),rgba(255,255,255,0.04))] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
+              <div className="mb-7 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff0d8] text-[#2d1d14] shadow-lg">
+                    <MessageCircle className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.26em] text-white/42">服务一</p>
+                    <h3 className="mt-1 text-3xl font-semibold text-[#fff5ea]">表情包生成</h3>
+                  </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={onLogout}
-                  className="flex items-center gap-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  退出
-                </Button>
-              </>
-            ) : (
-              <Button 
-                onClick={onLogin}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-              >
-                <User className="w-4 h-4 mr-2" />
-                登录/注册
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Service Cards */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
-          {/* Emoticon Service */}
-          <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 hover:border-pink-300 dark:hover:border-pink-600">
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <CardHeader className="relative pb-4">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-gradient-to-br from-pink-500 to-purple-500 rounded-xl shadow-lg">
-                  <MessageCircle className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl">表情包生成</CardTitle>
-                  <CardDescription>网络冲浪者专属</CardDescription>
-                </div>
+                <Badge className="rounded-full border-0 bg-white/10 px-3 py-1 text-white/78">热门</Badge>
               </div>
-            </CardHeader>
-            
-            <CardContent className="relative space-y-4">
-              <p className="text-gray-600 dark:text-gray-300">
-                根据电影视频/图片，生成3-5个高质量表情包，保留角色核心特征，适配微信/抖音平台
+
+              <p className="max-w-xl text-base leading-8 text-white/60">
+                多版本表情包输出，适合社交平台传播。
               </p>
-              
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Zap className="w-4 h-4 text-yellow-500" />
-                  <span>高清画质，无模糊</span>
+
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-[1.4rem] border border-white/10 bg-black/18 p-4">
+                  <Sparkles className="mb-3 h-5 w-5 text-amber-200" />
+                  <p className="text-sm text-white/82">高清画质</p>
+                  <p className="mt-1 text-xs leading-6 text-white/46">角色特征稳定</p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Clock className="w-4 h-4 text-blue-500" />
-                  <span>批量生成3-5个</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Shield className="w-4 h-4 text-green-500" />
-                  <span>角色特征完整保留</span>
+                <div className="rounded-[1.4rem] border border-white/10 bg-black/18 p-4">
+                  <Clock className="mb-3 h-5 w-5 text-cyan-200" />
+                  <p className="text-sm text-white/82">批量输出</p>
+                  <p className="mt-1 text-xs leading-6 text-white/46">一次生成 3-5 个版本</p>
                 </div>
               </div>
+            </article>
 
-              <Button 
-                onClick={() => onSelectService('emoticon')}
-                className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
-                size="lg"
-              >
-                立即生成表情包
-              </Button>
-
-              <div className="flex items-center gap-2 justify-center">
-                <Badge variant="secondary" className="text-xs">适配微信</Badge>
-                <Badge variant="secondary" className="text-xs">适配抖音</Badge>
-                <Badge variant="secondary" className="text-xs">趣味文字</Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Model Service */}
-          <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 hover:border-blue-300 dark:hover:border-blue-600">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <CardHeader className="relative pb-4">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl shadow-lg">
-                  <Box className="w-8 h-8 text-white" />
+            <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(160deg,rgba(174,223,255,0.1),rgba(255,255,255,0.04))] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
+              <div className="mb-7 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#dff6ff] text-[#14222c] shadow-lg">
+                    <Box className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.26em] text-white/42">服务二</p>
+                    <h3 className="mt-1 text-3xl font-semibold text-[#f0fbff]">周边建模图</h3>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle className="text-2xl">周边建模图</CardTitle>
-                  <CardDescription>商家制作专属</CardDescription>
-                </div>
+                <Badge className="rounded-full border-0 bg-white/10 px-3 py-1 text-white/78">商家</Badge>
               </div>
-            </CardHeader>
-            
-            <CardContent className="relative space-y-4">
-              <p className="text-gray-600 dark:text-gray-300">
-                为周边制作商家输出标准建模图，包含三视图、尺寸标注、材质建议，可直接用于生产
+
+              <p className="max-w-xl text-base leading-8 text-white/60">
+                输出更规范的角色建模方案，方便商家沟通。
               </p>
-              
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Box className="w-4 h-4 text-blue-500" />
-                  <span>三视图（正/侧/背）</span>
+
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-[1.4rem] border border-white/10 bg-black/18 p-4">
+                  <Box className="mb-3 h-5 w-5 text-cyan-200" />
+                  <p className="text-sm text-white/82">标准三视图</p>
+                  <p className="mt-1 text-xs leading-6 text-white/46">正 / 侧 / 背完整</p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Shield className="w-4 h-4 text-green-500" />
-                  <span>关键尺寸标注</span>
+                <div className="rounded-[1.4rem] border border-white/10 bg-black/18 p-4">
+                  <Shield className="mb-3 h-5 w-5 text-emerald-200" />
+                  <p className="text-sm text-white/82">尺寸与材质</p>
+                  <p className="mt-1 text-xs leading-6 text-white/46">适合生产沟通</p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Users className="w-4 h-4 text-purple-500" />
-                  <span>材质与工艺说明</span>
+              </div>
+            </article>
+          </section>
+
+          <section className="mt-8">
+            <div className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.04))] p-7 backdrop-blur-2xl">
+              <p className="text-sm uppercase tracking-[0.3em] text-white/38">额度概览</p>
+              <div className="mt-4 grid gap-5 md:grid-cols-2">
+                <div className="rounded-[1.5rem] border border-white/10 bg-black/18 p-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/78">表情包额度</span>
+                    <span className="text-2xl font-semibold text-[#fff1de]">0 / 10</span>
+                  </div>
+                  <div className="mt-4 h-2 rounded-full bg-white/10">
+                    <div className="h-2 w-1/12 rounded-full bg-[linear-gradient(90deg,#ffebc7,#ffb86b)]" />
+                  </div>
+                </div>
+
+                <div className="rounded-[1.5rem] border border-white/10 bg-black/18 p-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/78">建模图额度</span>
+                    <span className="text-2xl font-semibold text-[#edf9ff]">0 / 5</span>
+                  </div>
+                  <div className="mt-4 h-2 rounded-full bg-white/10">
+                    <div className="h-2 w-1/12 rounded-full bg-[linear-gradient(90deg,#dcf5ff,#6ec8ff)]" />
+                  </div>
                 </div>
               </div>
 
-              <Button 
-                onClick={() => onSelectService('model')}
-                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
-                size="lg"
-              >
-                立即生成建模图
-              </Button>
-
-              <div className="flex items-center gap-2 justify-center">
-                <Badge variant="secondary" className="text-xs">工程图纸标准</Badge>
-                <Badge variant="secondary" className="text-xs">可落地生产</Badge>
-                <Badge variant="secondary" className="text-xs">批量订单</Badge>
+              <div className="mt-5">
+                {!currentUser ? (
+                  <Button
+                    onClick={onLogin}
+                    className="h-12 w-full rounded-full bg-[#fff1db] text-[#26170f] hover:bg-white"
+                  >
+                    登录获取更多额度
+                  </Button>
+                ) : (
+                  <div className="rounded-[1.5rem] border border-emerald-300/18 bg-emerald-400/8 p-4 text-sm text-emerald-100/80">
+                    当前账号可直接开始生成。
+                  </div>
+                )}
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Features */}
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-8 text-gray-800 dark:text-gray-200">
-            为什么选择我们的服务
-          </h2>
-          
-          <div className="grid md:grid-cols-4 gap-6">
-            <div className="p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl">
-              <div className="text-3xl mb-2">⚡</div>
-              <h3 className="font-semibold mb-1">快速生成</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">AI智能分析，即时输出</p>
             </div>
-            
-            <div className="p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl">
-              <div className="text-3xl mb-2">🎯</div>
-              <h3 className="font-semibold mb-1">精准还原</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">保留角色核心特征</p>
-            </div>
-            
-            <div className="p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl">
-              <div className="text-3xl mb-2">📐</div>
-              <h3 className="font-semibold mb-1">标准规范</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">符合生产标准</p>
-            </div>
-            
-            <div className="p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl">
-              <div className="text-3xl mb-2">🔒</div>
-              <h3 className="font-semibold mb-1">安全可靠</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">版权合规，服务稳定</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Subscription Hint */}
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-md">
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              已用额度：
-            </span>
-            <Badge className="bg-purple-500">表情包 0/10</Badge>
-            <Badge className="bg-blue-500">建模图 0/5</Badge>
-            {!currentUser && (
-              <Button 
-                variant="link" 
-                className="text-sm text-purple-600 p-0 h-auto ml-2"
-                onClick={onLogin}
-              >
-                登录获取更多额度 →
-              </Button>
-            )}
-          </div>
-        </div>
+          </section>
       </div>
     </div>
   );

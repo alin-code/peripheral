@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ImageGenerationClient, Config, HeaderUtils } from 'coze-coding-dev-sdk';
 import { verifyAuthToken } from '@/lib/auth';
+import { requestArkImageGeneration } from '@/lib/ark';
 
 // 表情包配置
 const EMOTICON_CAPTIONS = {
@@ -107,13 +107,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 提取请求头
-    const customHeaders = HeaderUtils.extractForwardHeaders(request.headers);
-
-    // 初始化图片生成客户端
-    const config = new Config();
-    const client = new ImageGenerationClient(config, customHeaders);
-
     // 处理图片输入 - 优先使用base64
     let referenceImage: string | string[] | undefined;
     
@@ -153,7 +146,17 @@ export async function POST(request: NextRequest) {
     console.log('提示词示例:', emoticonRequests[0]?.prompt.substring(0, 100) + '...');
 
     // 批量生成
-    const responses = await client.batchGenerate(emoticonRequests);
+    const responses = await Promise.all(
+      emoticonRequests.map((item) =>
+        requestArkImageGeneration({
+          prompt: item.prompt,
+          size: item.size,
+          image: item.image,
+          responseFormat: 'url',
+          watermark: false,
+        }),
+      ),
+    );
     
     const emoticons: Array<{
       id: string;
@@ -165,12 +168,15 @@ export async function POST(request: NextRequest) {
     const captions = getRandomCaptions(platform, captionCount);
 
     responses.forEach((response, index) => {
-      const helper = client.getResponseHelper(response);
-      if (helper.success && helper.imageUrls.length > 0) {
+      const imageUrls = response.data
+        .filter((item) => !item.error && item.url)
+        .map((item) => item.url as string);
+
+      if (imageUrls.length > 0) {
         const isWechat = platform === 'wechat' || platform === 'both';
         emoticons.push({
           id: `emoticon-${Date.now()}-${index}`,
-          url: helper.imageUrls[0],
+          url: imageUrls[0],
           caption: captions[index] || '',
           platform: isWechat ? 'wechat' : (index % 2 === 0 ? 'wechat' : 'douyin'),
           emotionType: emotionVariations[index % emotionVariations.length].split(',')[0]
