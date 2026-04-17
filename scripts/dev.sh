@@ -1,34 +1,44 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-
-PORT=5000
 COZE_WORKSPACE_PATH="${COZE_WORKSPACE_PATH:-$(pwd)}"
-DEPLOY_RUN_PORT=5000
-
+PREFERRED_PORT="${PORT:-5000}"
+FALLBACK_PORT="${FALLBACK_PORT:-8888}"
+LOG_DIR="${LOG_DIR:-${COZE_WORKSPACE_PATH}/logs}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/dev.log}"
 
 cd "${COZE_WORKSPACE_PATH}"
+mkdir -p "${LOG_DIR}"
 
-kill_port_if_listening() {
-    local pids
-    pids=$(ss -H -lntp 2>/dev/null | awk -v port="${DEPLOY_RUN_PORT}" '$4 ~ ":"port"$"' | grep -o 'pid=[0-9]*' | cut -d= -f2 | paste -sd' ' - || true)
-    if [[ -z "${pids}" ]]; then
-      echo "Port ${DEPLOY_RUN_PORT} is free."
-      return
+exec > >(tee -a "${LOG_FILE}") 2>&1
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting dev log stream at ${LOG_FILE}"
+
+is_port_listening() {
+    local port="$1"
+
+    if command -v lsof >/dev/null 2>&1; then
+        lsof -nP -iTCP:"${port}" -sTCP:LISTEN >/dev/null 2>&1
+        return
     fi
-    echo "Port ${DEPLOY_RUN_PORT} in use by PIDs: ${pids} (SIGKILL)"
-    echo "${pids}" | xargs -I {} kill -9 {}
-    sleep 1
-    pids=$(ss -H -lntp 2>/dev/null | awk -v port="${DEPLOY_RUN_PORT}" '$4 ~ ":"port"$"' | grep -o 'pid=[0-9]*' | cut -d= -f2 | paste -sd' ' - || true)
-    if [[ -n "${pids}" ]]; then
-      echo "Warning: port ${DEPLOY_RUN_PORT} still busy after SIGKILL, PIDs: ${pids}"
-    else
-      echo "Port ${DEPLOY_RUN_PORT} cleared."
+
+    if command -v ss >/dev/null 2>&1; then
+        ss -H -lnt 2>/dev/null | awk -v port="${port}" '$4 ~ ":"port"$"' | grep -q .
+        return
     fi
+
+    return 1
 }
 
-echo "Clearing port ${PORT} before start."
-kill_port_if_listening
-echo "Starting HTTP service on port ${PORT} for dev..."
+if is_port_listening "${PREFERRED_PORT}"; then
+    echo "Port ${PREFERRED_PORT} is already in use, trying fallback port ${FALLBACK_PORT}."
+    if is_port_listening "${FALLBACK_PORT}"; then
+        echo "Port ${FALLBACK_PORT} is also in use. Please free one of the ports and retry."
+        exit 1
+    fi
+    PORT="${FALLBACK_PORT}"
+else
+    PORT="${PREFERRED_PORT}"
+fi
 
-PORT=$PORT pnpm tsx watch src/server.ts
+echo "Starting HTTP service on port ${PORT} for dev..."
+PORT="${PORT}" pnpm exec tsx watch src/server.ts

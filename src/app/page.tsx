@@ -20,6 +20,7 @@ export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [pendingService, setPendingService] = useState<ServiceType | null>(null);
 
   // 检查登录状态
   useEffect(() => {
@@ -44,6 +45,12 @@ export default function Home() {
   };
 
   const handleSelectService = (service: 'emoticon' | 'model') => {
+    if (service === 'emoticon' && !currentUser) {
+      setPendingService(service);
+      setShowLogin(true);
+      return;
+    }
+
     setCurrentService(service);
   };
 
@@ -58,6 +65,10 @@ export default function Home() {
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
     setShowLogin(false);
+    if (pendingService) {
+      setCurrentService(pendingService);
+      setPendingService(null);
+    }
   };
 
   const handleLogout = async () => {
@@ -105,7 +116,11 @@ export default function Home() {
         />
       )}
       {currentService === 'emoticon' && (
-        <EmoticonGenerator onBack={handleBack} />
+        <EmoticonGenerator
+          onBack={handleBack}
+          currentUser={currentUser}
+          onRequireLogin={handleLogin}
+        />
       )}
       {currentService === 'model' && (
         <ModelGenerator onBack={handleBack} />

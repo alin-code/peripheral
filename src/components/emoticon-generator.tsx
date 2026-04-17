@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,8 @@ import FileUploader from './file-uploader';
 
 interface EmoticonGeneratorProps {
   onBack: () => void;
+  currentUser?: { id: string; email: string; username?: string } | null;
+  onRequireLogin?: () => void;
 }
 
 interface Emoticon {
@@ -33,7 +36,11 @@ interface Emoticon {
   emotionType?: string;
 }
 
-export default function EmoticonGenerator({ onBack }: EmoticonGeneratorProps) {
+export default function EmoticonGenerator({
+  onBack,
+  currentUser,
+  onRequireLogin,
+}: EmoticonGeneratorProps) {
   const [inputMode, setInputMode] = useState<'upload' | 'url'>('upload');
   const [uploadedFile, setUploadedFile] = useState<{ preview: string; name: string } | null>(null);
   const [imageUrl, setImageUrl] = useState('');
@@ -57,6 +64,13 @@ export default function EmoticonGenerator({ onBack }: EmoticonGeneratorProps) {
   };
 
   const handleGenerate = async () => {
+    if (!currentUser) {
+      setError('请先登录后再生成表情包');
+      toast.error('请先登录后再生成表情包');
+      onRequireLogin?.();
+      return;
+    }
+
     // 检查是否有图片素材
     if (!uploadedFile && !imageUrl) {
       setError('请上传图片或输入图片URL');
@@ -98,6 +112,9 @@ export default function EmoticonGenerator({ onBack }: EmoticonGeneratorProps) {
         setEmoticons(data.emoticons);
       } else {
         setError(data.error || '生成失败，请重试');
+        if (response.status === 401) {
+          onRequireLogin?.();
+        }
       }
     } catch (err) {
       setError('网络错误，请检查连接后重试');

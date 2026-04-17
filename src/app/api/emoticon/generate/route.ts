@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ImageGenerationClient, Config, HeaderUtils } from 'coze-coding-dev-sdk';
+import { verifyAuthToken } from '@/lib/auth';
 
 // 表情包配置
 const EMOTICON_CAPTIONS = {
@@ -87,6 +88,14 @@ function generatePrompt(characterName?: string, sceneDescription?: string, isRef
 // 表情包生成API
 export async function POST(request: NextRequest) {
   try {
+    const token = request.cookies.get('auth_token')?.value;
+    if (!token || !verifyAuthToken(token)) {
+      return NextResponse.json(
+        { success: false, error: '请先登录后再生成表情包' },
+        { status: 401 }
+      );
+    }
+
     const body: EmoticonRequest = await request.json();
     const { imageUrl, base64Data, characterName, sceneDescription, count = 3, platform = 'both' } = body;
 

@@ -2,9 +2,15 @@
 set -Eeuo pipefail
 
 COZE_WORKSPACE_PATH="${COZE_WORKSPACE_PATH:-$(pwd)}"
-
 PORT=5000
 DEPLOY_RUN_PORT="${DEPLOY_RUN_PORT:-$PORT}"
+LOG_DIR="${LOG_DIR:-${COZE_WORKSPACE_PATH}/logs}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/start.log}"
+
+mkdir -p "${LOG_DIR}"
+
+exec > >(tee -a "${LOG_FILE}") 2>&1
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting deploy log stream at ${LOG_FILE}"
 
 
 start_service() {

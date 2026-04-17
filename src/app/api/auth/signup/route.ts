@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcrypt';
-
-// Supabase 配置 - 从环境变量获取
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || '';
+import { createUser, findUserByEmail } from '@/lib/user-repository';
 
 interface SignUpRequest {
   email: string;
@@ -33,16 +29,6 @@ function isValidPassword(password: string): { valid: boolean; message: string } 
     return { valid: false, message: '密码需包含至少一个数字' };
   }
   return { valid: true, message: '' };
-}
-
-// 创建 Supabase 管理员客户端（使用 service key）
-function getSupabaseAdmin() {
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
 }
 
 // 用户注册
@@ -76,23 +62,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 检查 Supabase 配置
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!process.env.POSTGRES_URL) {
       return NextResponse.json(
         { success: false, error: '服务配置错误，请联系管理员' },
         { status: 500 }
       );
     }
 
-    const supabase = getSupabaseAdmin();
-
-    // 检查邮箱是否已存在
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id, email')
-      .eq('email', email.toLowerCase())
-      .single();
-
+    const existingUser = await findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
         { success: false, error: '该邮箱已被注册' },
@@ -103,26 +80,7 @@ export async function POST(request: NextRequest) {
     // 密码哈希
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // 创建用户
-    const { data: newUser, error: createError } = await supabase
-      .from('users')
-      .insert({
-        email: email.toLowerCase(),
-        password_hash: passwordHash,
-        username: username || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-
-    if (createError) {
-      console.error('创建用户失败:', createError);
-      return NextResponse.json(
-        { success: false, error: '注册失败，请稍后重试' },
-        { status: 500 }
-      );
-    }
+    const newUser = await createUser(email, passwordHash, username);
 
     // 返回成功响应（不包含密码哈希）
     return NextResponse.json({
@@ -137,6 +95,18 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
 
   } catch (error) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      error.code === '23505'
+    ) {
+      return NextResponse.json(
+        { success: false, error: '该邮箱已被注册' },
+        { status: 409 }
+      );
+    }
+
     console.error('注册错误:', error);
     return NextResponse.json(
       { success: false, error: '服务异常，请稍后重试' },

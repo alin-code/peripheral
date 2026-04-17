@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
-
-// Supabase 配置 - 从环境变量获取
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || '';
-const jwtSecret = process.env.JWT_SECRET || 'your-jwt-secret-key';
-
+import { generateAuthToken, verifyAuthToken } from '@/lib/auth';
+import { findUserByEmail, findUserById, updateLastLoginAt } from '@/lib/user-repository';
 interface SignInRequest {
   email: string;
   password: string;
@@ -17,40 +12,6 @@ interface SignInRequest {
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
-}
-
-// 简单的 JWT 生成（生产环境建议使用专业的 JWT 库）
-function generateToken(payload: { userId: string; email: string }): string {
-  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64');
-  const body = Buffer.from(JSON.stringify({ ...payload, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 })).toString('base64');
-  const signature = Buffer.from(`${header}.${body}.${jwtSecret}`).toString('base64');
-  return `${header}.${body}.${signature}`;
-}
-
-// 验证 JWT token
-function verifyToken(token: string): { userId: string; email: string } | null {
-  try {
-    const [header, body, signature] = token.split('.');
-    const expectedSignature = Buffer.from(`${header}.${body}.${jwtSecret}`).toString('base64');
-    if (signature !== expectedSignature) return null;
-    
-    const payload = JSON.parse(Buffer.from(body, 'base64').toString());
-    if (payload.exp < Date.now()) return null;
-    
-    return { userId: payload.userId, email: payload.email };
-  } catch {
-    return null;
-  }
-}
-
-// 创建 Supabase 管理员客户端
-function getSupabaseAdmin() {
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
 }
 
 // 用户登录
@@ -75,24 +36,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 检查 Supabase 配置
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!process.env.POSTGRES_URL) {
       return NextResponse.json(
         { success: false, error: '服务配置错误，请联系管理员' },
         { status: 500 }
       );
     }
 
-    const supabase = getSupabaseAdmin();
-
-    // 查询用户
-    const { data: user, error: queryError } = await supabase
-      .from('users')
-      .select('id, email, password_hash, username, avatar_url, is_active')
-      .eq('email', email.toLowerCase())
-      .single();
-
-    if (queryError || !user) {
+    const user = await findUserByEmail(email);
+    if (!user) {
       return NextResponse.json(
         { success: false, error: '邮箱或密码错误' },
         { status: 401 }
@@ -117,13 +69,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 更新最后登录时间
-    await supabase
-      .from('users')
-      .update({ last_login_at: new Date().toISOString() })
-      .eq('id', user.id);
+    await updateLastLoginAt(user.id);
 
     // 生成 token
-    const token = generateToken({ userId: user.id, email: user.email });
+    const token = generateAuthToken({ userId: user.id, email: user.email });
 
     // 设置 cookie
     const cookieStore = await cookies();
@@ -169,7 +118,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const payload = verifyToken(token);
+    const payload = verifyAuthToken(token);
     if (!payload) {
       return NextResponse.json({
         authenticated: false,
@@ -177,23 +126,14 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 检查 Supabase 配置
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!process.env.POSTGRES_URL) {
       return NextResponse.json({
         authenticated: false,
         error: '服务配置错误'
       });
     }
 
-    const supabase = getSupabaseAdmin();
-
-    // 查询用户信息
-    const { data: user } = await supabase
-      .from('users')
-      .select('id, email, username, avatar_url, created_at')
-      .eq('id', payload.userId)
-      .single();
-
+    const user = await findUserById(payload.userId);
     if (!user) {
       return NextResponse.json({
         authenticated: false,
