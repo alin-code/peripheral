@@ -143,35 +143,35 @@ export default function EmoticonGenerator({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
-      <div className="container mx-auto px-4 py-8">
+    <div className="design-page">
+      <div className="design-shell">
         {/* Header */}
         <div className="mb-8">
           <Button 
             variant="ghost" 
             onClick={onBack}
-            className="mb-4 text-gray-700 hover:bg-white/70"
+            className="mb-4 text-white/78 hover:bg-white/10 hover:text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             返回服务选择
           </Button>
           
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg">
+            <div className="rounded-lg bg-[#ff6848] p-2">
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-semibold tracking-normal text-white">
               电影表情包生成
             </h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-white/62">
             上传素材并生成表情包
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Input Panel */}
-          <Card>
+          <Card className="design-panel rounded-lg">
             <CardHeader>
               <CardTitle>素材上传</CardTitle>
               <CardDescription>支持上传或粘贴链接</CardDescription>
@@ -180,17 +180,17 @@ export default function EmoticonGenerator({
             <CardContent className="space-y-6">
               {/* Input Mode Tabs */}
               <Tabs value={inputMode} onValueChange={(v) => setInputMode(v as 'upload' | 'url')}>
-                <TabsList className="grid h-auto w-full grid-cols-2 rounded-2xl border border-[#e2d4cb] bg-[#eaded7] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+                <TabsList className="grid h-auto w-full grid-cols-2 rounded-lg border border-[#e2d4cb] bg-[#eaded7] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
                   <TabsTrigger
                     value="upload"
-                    className="h-11 gap-2 rounded-xl border border-transparent text-sm font-semibold text-[#5f514c] data-[state=active]:border-[#2b201d] data-[state=active]:bg-[#1d1413] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(29,20,19,0.18)]"
+                    className="h-11 gap-2 rounded-md border border-transparent text-sm font-semibold text-[#5f514c] data-[state=active]:border-[#171513] data-[state=active]:bg-[#171513] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(29,20,19,0.18)]"
                   >
                     <Sparkles className="w-4 h-4" />
                     本地上传
                   </TabsTrigger>
                   <TabsTrigger
                     value="url"
-                    className="h-11 gap-2 rounded-xl border border-transparent text-sm font-semibold text-[#5f514c] data-[state=active]:border-[#4a342d] data-[state=active]:bg-[#3a2a25] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(58,42,37,0.18)]"
+                    className="h-11 gap-2 rounded-md border border-transparent text-sm font-semibold text-[#5f514c] data-[state=active]:border-[#171513] data-[state=active]:bg-[#171513] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(58,42,37,0.18)]"
                   >
                     <Link className="w-4 h-4" />
                     图片链接
@@ -218,6 +218,7 @@ export default function EmoticonGenerator({
                         type="url"
                         placeholder="https://example.com/movie-poster.jpg"
                         value={imageUrl}
+                        className="design-input"
                         onChange={(e) => {
                           setImageUrl(e.target.value);
                           setUploadedFile(null);
@@ -252,6 +253,7 @@ export default function EmoticonGenerator({
                   id="characterName"
                   placeholder="例如：蜘蛛侠、钢铁侠"
                   value={characterName}
+                  className="design-input"
                   onChange={(e) => setCharacterName(e.target.value)}
                 />
                 <p className="text-xs text-gray-500">
@@ -266,6 +268,7 @@ export default function EmoticonGenerator({
                   id="sceneDescription"
                   placeholder="描述你想要的场景，例如：主角举剑的经典画面、角色惊讶的表情特写"
                   value={sceneDescription}
+                  className="design-input"
                   onChange={(e) => setSceneDescription(e.target.value)}
                   rows={3}
                 />
@@ -274,14 +277,14 @@ export default function EmoticonGenerator({
               {/* Platform Selection */}
               <div className="space-y-2">
                 <Label>适配平台</Label>
-                <div className="flex gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     variant={platform === 'wechat' ? 'default' : 'outline'}
                     onClick={() => setPlatform('wechat')}
                     className={
                       platform === 'wechat'
-                        ? 'border-green-600 bg-green-600 text-white shadow-sm hover:bg-green-700'
-                        : 'border-gray-300 bg-white text-gray-700 hover:border-green-500 hover:bg-green-50 hover:text-green-700'
+                        ? 'border-[#171513] bg-[#171513] text-white shadow-sm hover:bg-[#2a2320]'
+                        : 'design-secondary'
                     }
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
@@ -292,8 +295,8 @@ export default function EmoticonGenerator({
                     onClick={() => setPlatform('douyin')}
                     className={
                       platform === 'douyin'
-                        ? 'border-black bg-black text-white shadow-sm hover:bg-gray-900'
-                        : 'border-gray-300 bg-white text-gray-700 hover:border-black hover:bg-gray-100 hover:text-black'
+                        ? 'border-[#171513] bg-[#171513] text-white shadow-sm hover:bg-[#2a2320]'
+                        : 'design-secondary'
                     }
                   >
                     <Instagram className="w-4 h-4 mr-2" />
@@ -304,8 +307,8 @@ export default function EmoticonGenerator({
                     onClick={() => setPlatform('both')}
                     className={
                       platform === 'both'
-                        ? 'border-purple-600 bg-purple-600 text-white shadow-sm hover:bg-purple-700'
-                        : 'border-gray-300 bg-white text-gray-700 hover:border-purple-500 hover:bg-purple-50 hover:text-purple-700'
+                        ? 'border-[#ff6848] bg-[#ff6848] text-white shadow-sm hover:bg-[#e8583d]'
+                        : 'design-secondary'
                     }
                   >
                     双平台
@@ -317,7 +320,7 @@ export default function EmoticonGenerator({
               <Button
                 onClick={handleGenerate}
                 disabled={isGenerating || (!uploadedFile && !imageUrl)}
-                className="w-full border border-pink-300/40 bg-gradient-to-r from-pink-500 to-purple-500 font-semibold text-white shadow-[0_12px_30px_rgba(191,90,242,0.22)] hover:from-pink-600 hover:to-purple-600"
+                className="design-primary w-full font-semibold"
                 size="lg"
               >
                 {isGenerating ? (
@@ -332,17 +335,17 @@ export default function EmoticonGenerator({
 
               {/* Error */}
               {error && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
                   <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
                 </div>
               )}
 
               {/* Tips */}
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">
+                <div className="design-muted-card rounded-lg p-4">
+                <h4 className="mb-2 font-medium text-[#2f271f]">
                   提示
                 </h4>
-                <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
+                <ul className="space-y-1 text-sm text-[#6d6256]">
                   <li>• 高清原图效果更好</li>
                   <li>• 可下载 PNG</li>
                 </ul>
@@ -351,7 +354,7 @@ export default function EmoticonGenerator({
           </Card>
 
           {/* Output Panel */}
-          <Card>
+          <Card className="design-panel rounded-lg">
             <CardHeader>
               <CardTitle>生成结果</CardTitle>
               <CardDescription>
@@ -372,13 +375,13 @@ export default function EmoticonGenerator({
                     cardImages={loadingCardImages}
                     repeat={6}
                     initialSpeed={170}
-                    className="rounded-[30px]"
+                    className="rounded-lg"
                   />
 
-                  <div className="rounded-2xl border border-purple-200/50 bg-gradient-to-r from-pink-50 via-white to-purple-50 p-4">
+                  <div className="rounded-lg border border-[#eadfd2] bg-[#fbf7f1] p-4">
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-medium text-gray-700">生成进度</span>
-                      <span className="font-semibold text-purple-600">{progress}%</span>
+                      <span className="font-semibold text-[#ff6848]">{progress}%</span>
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
                       正在提取角色特征、组合文案并生成多张适配图。
@@ -387,7 +390,7 @@ export default function EmoticonGenerator({
                 </div>
               ) : emoticons.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-[#f1e8dc]">
                     <MessageCircle className="w-8 h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-500 dark:text-gray-400">
@@ -399,11 +402,11 @@ export default function EmoticonGenerator({
                   {emoticons.map((emoticon, index) => (
                     <div 
                       key={emoticon.id}
-                      className="relative p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow"
+                      className="relative rounded-lg border border-[#eadfd2] bg-white p-4 transition-shadow hover:shadow-lg"
                     >
                       <div className="flex gap-4">
                         {/* Image Preview */}
-                        <div className="w-32 h-32 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                        <div className="h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg bg-[#f1e8dc]">
                           <img
                             src={emoticon.url}
                             alt={`表情包 ${index + 1}`}
@@ -425,11 +428,11 @@ export default function EmoticonGenerator({
                             </Badge>
                           </div>
                           
-                          <div className="text-lg font-medium text-gray-900 dark:text-white">
+                          <div className="text-lg font-semibold text-[#171513]">
                             {emoticon.caption}
                           </div>
                           
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                          <p className="text-sm text-[#6d6256]">
                             适配平台：{emoticon.platform === 'wechat' ? '微信表情商店' : '抖音贴纸'}
                           </p>
                         </div>
@@ -438,7 +441,7 @@ export default function EmoticonGenerator({
                         <Button
                           variant="outline"
                           onClick={() => downloadImage(emoticon)}
-                          className="flex-shrink-0 rounded-xl border-[#2e221f] bg-[#2a1d1a] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(42,29,26,0.2)] hover:border-[#1d1413] hover:bg-[#1d1413]"
+                          className="design-primary flex-shrink-0 rounded-lg px-4 text-sm font-semibold"
                         >
                           <Download className="mr-2 h-4 w-4" />
                           下载
@@ -448,7 +451,7 @@ export default function EmoticonGenerator({
                   ))}
 
                   {/* Success Message */}
-                  <div className="flex items-center gap-2 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
                     <CheckCircle2 className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-sm font-medium text-green-800 dark:text-green-300">
@@ -461,11 +464,11 @@ export default function EmoticonGenerator({
                   </div>
 
                   {/* Platform适配说明 */}
-                  <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                    <h4 className="font-medium text-purple-900 dark:text-purple-300 mb-2">
+                  <div className="design-muted-card rounded-lg p-4">
+                    <h4 className="mb-2 font-medium text-[#2f271f]">
                       平台说明
                     </h4>
-                    <div className="space-y-2 text-sm text-purple-700 dark:text-purple-400">
+                    <div className="space-y-2 text-sm text-[#6d6256]">
                       <p><strong>微信：</strong>1:1</p>
                       <p><strong>抖音：</strong>1:1 / 9:16</p>
                     </div>
@@ -478,13 +481,13 @@ export default function EmoticonGenerator({
 
         {/* Subscription Hint */}
         <div className="mt-8 text-center">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-md">
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#eadfd2] bg-white/90 px-6 py-3 shadow-md backdrop-blur-sm">
+            <span className="text-sm text-[#5f5549]">
               当前额度：
             </span>
-            <Badge className="bg-pink-500">表情包 1/10</Badge>
+            <Badge className="bg-[#ff6848]">表情包 1/10</Badge>
             <span className="text-sm text-gray-500">|</span>
-            <Button variant="link" className="text-sm text-purple-600 p-0 h-auto">
+            <Button variant="link" className="h-auto p-0 text-sm text-[#171513]">
               升级 →
             </Button>
           </div>

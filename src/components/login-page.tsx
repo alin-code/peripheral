@@ -214,14 +214,14 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
-      <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen">
+    <div className="design-page">
+      <div className="design-shell flex min-h-screen flex-col items-center justify-center">
         {/* Back Button */}
         {onBack && (
           <Button 
             variant="ghost" 
             onClick={onBack}
-            className="absolute top-8 left-8 text-gray-700 hover:bg-white/70"
+            className="absolute left-4 top-6 text-white/78 hover:bg-white/10 hover:text-white sm:left-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             返回
@@ -229,34 +229,34 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
         )}
 
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-4">
-            <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+        <div className="mb-8 text-center text-white">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 backdrop-blur">
+            <Sparkles className="w-5 h-5 text-[#ffcf75]" />
+            <span className="text-sm font-medium text-white/78">
               电影周边服务
             </span>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-semibold tracking-normal text-white">
             欢迎回来
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
+          <p className="mt-2 text-white/58">
             登录或注册
           </p>
         </div>
 
         {/* Auth Card */}
-        <Card className="w-full max-w-md shadow-xl">
+        <Card className="design-panel w-full max-w-md rounded-lg">
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'signup')} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 rounded-none rounded-t-xl bg-[#efe3dc] p-1.5">
+            <TabsList className="grid w-full grid-cols-2 rounded-t-lg bg-[#eee4d8] p-1.5">
               <TabsTrigger
                 value="login"
-                className="rounded-lg border border-transparent font-semibold text-[#6a5750] data-[state=active]:border-[#2d2220] data-[state=active]:bg-[#1c1413] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(28,20,19,0.18)]"
+                className="rounded-md border border-transparent font-semibold text-[#6a5750] data-[state=active]:border-[#171513] data-[state=active]:bg-[#171513] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(28,20,19,0.18)]"
               >
                 登录
               </TabsTrigger>
               <TabsTrigger
                 value="signup"
-                className="rounded-lg border border-transparent font-semibold text-[#6a5750] data-[state=active]:border-[#4f3596] data-[state=active]:bg-[#7c3aed] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(124,58,237,0.2)]"
+                className="rounded-md border border-transparent font-semibold text-[#6a5750] data-[state=active]:border-[#ff6848] data-[state=active]:bg-[#ff6848] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(255,104,72,0.2)]"
               >
                 注册
               </TabsTrigger>
@@ -285,7 +285,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                         placeholder="your@email.com"
                         value={loginEmail}
                         onChange={(e) => setLoginEmail(e.target.value)}
-                        className="pl-10"
+                        className="design-input pl-10"
                       />
                     </div>
                   </div>
@@ -301,7 +301,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                         placeholder="输入密码"
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
-                        className="pl-10 pr-10"
+                        className="design-input pl-10 pr-10"
                       />
                       <button
                         type="button"
@@ -325,7 +325,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                   <Button
                     type="submit"
                     disabled={isLoggingIn}
-                    className="w-full border border-purple-300/40 bg-gradient-to-r from-purple-600 to-pink-500 font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.22)] hover:from-purple-700 hover:to-pink-600"
+                      className="design-primary w-full font-semibold"
                   >
                     {isLoggingIn ? (
                       <>
@@ -374,7 +374,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                           placeholder="your@email.com"
                           value={signupEmail}
                           onChange={(e) => setSignupEmail(e.target.value)}
-                          className="pl-10"
+                          className="design-input pl-10"
                         />
                       </div>
                     </div>
@@ -390,7 +390,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                           placeholder="设置一个昵称"
                           value={signupUsername}
                           onChange={(e) => setSignupUsername(e.target.value)}
-                          className="pl-10"
+                          className="design-input pl-10"
                         />
                       </div>
                     </div>
@@ -406,7 +406,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                           placeholder="设置密码"
                           value={signupPassword}
                           onChange={(e) => setSignupPassword(e.target.value)}
-                          className="pl-10 pr-10"
+                          className="design-input pl-10 pr-10"
                         />
                         <button
                           type="button"
@@ -429,17 +429,17 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                           placeholder="再次输入密码"
                           value={signupConfirmPassword}
                           onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                          className="pl-10"
+                          className="design-input pl-10"
                         />
                       </div>
                     </div>
 
                     {/* Password Requirements */}
-                    <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <p className="text-xs text-blue-700 dark:text-blue-400 mb-2 font-medium">
+                    <div className="design-muted-card rounded-lg p-3">
+                      <p className="mb-2 text-xs font-medium text-[#51473d]">
                         密码要求：
                       </p>
-                      <ul className="text-xs text-blue-600 dark:text-blue-500 space-y-1">
+                      <ul className="space-y-1 text-xs text-[#7a6f62]">
                         <li className={signupPassword.length >= 8 ? 'text-green-600' : ''}>
                           {signupPassword.length >= 8 ? '✓' : '○'} 至少8个字符
                         </li>
@@ -491,7 +491,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
                     <Button
                       type="submit"
                       disabled={isSigningUp || !turnstileToken}
-                      className="w-full border border-cyan-300/40 bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold text-white shadow-[0_12px_30px_rgba(37,99,235,0.22)] hover:from-blue-700 hover:to-cyan-600"
+                      className="w-full border border-[#ff6848] bg-[#ff6848] font-semibold text-white shadow-[0_12px_30px_rgba(255,104,72,0.22)] hover:bg-[#e8583d]"
                     >
                       {isSigningUp ? (
                         <>
@@ -510,11 +510,11 @@ export default function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
         </Card>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="mt-6 text-center text-sm text-white/58">
           登录即表示同意{' '}
-          <a href="#" className="text-purple-600 hover:underline">服务条款</a>
+          <a href="#" className="text-[#ffcf75] hover:underline">服务条款</a>
           {' '}和{' '}
-          <a href="#" className="text-purple-600 hover:underline">隐私政策</a>
+          <a href="#" className="text-[#ffcf75] hover:underline">隐私政策</a>
         </p>
       </div>
     </div>

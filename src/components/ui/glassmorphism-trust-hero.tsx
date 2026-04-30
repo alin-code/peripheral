@@ -1,35 +1,25 @@
 import React from 'react';
 import {
   ArrowRight,
-  Play,
-  Target,
-  Crown,
-  Star,
-  MessageCircle,
   Box,
-  ScanSearch,
-  Palette,
-  Layers3,
-  User,
+  Check,
   LogOut,
+  MessageCircle,
+  Play,
+  Sparkles,
+  User,
 } from 'lucide-react';
 
-const CAPABILITIES = [
-  { name: '表情包生成', icon: MessageCircle },
-  { name: '三视图建模', icon: Box },
-  { name: '角色识别', icon: ScanSearch },
-  { name: '材质建议', icon: Palette },
-  { name: '结构说明', icon: Layers3 },
+const PREVIEW_ITEMS = [
+  { label: '表情包版本', value: '3-5' },
+  { label: '建模输出', value: '3视图' },
+  { label: '素材处理', value: '剧照/海报' },
 ];
 
-const StatItem = ({ value, label }: { value: string; label: string }) => (
-  <div className="flex cursor-default flex-col items-center justify-center transition-transform hover:-translate-y-1">
-    <span className="whitespace-nowrap text-lg font-bold text-white sm:text-2xl">{value}</span>
-    <span className="whitespace-nowrap text-[9px] font-medium tracking-[0.18em] text-zinc-500 sm:text-[11px]">
-      {label}
-    </span>
-  </div>
-);
+const OUTPUTS = [
+  { icon: MessageCircle, title: '表情包', text: '短文案、多情绪、适合聊天传播' },
+  { icon: Box, title: '建模图', text: '正侧背三视图、材质与尺寸建议' },
+];
 
 interface GlassmorphismTrustHeroProps {
   currentUser?: { id: string; email: string; username?: string } | null;
@@ -47,56 +37,26 @@ export default function HeroSection({
   onCreateModel,
 }: GlassmorphismTrustHeroProps) {
   return (
-    <section className="relative w-full overflow-hidden bg-zinc-950 font-sans text-white">
-      <style>{`
-        @keyframes fadeSlideIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        .animate-fade-in {
-          animation: fadeSlideIn 0.8s ease-out forwards;
-          opacity: 0;
-        }
-        .animate-marquee {
-          animation: marquee 40s linear infinite;
-        }
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-        .delay-400 { animation-delay: 0.4s; }
-        .delay-500 { animation-delay: 0.5s; }
-      `}</style>
+    <section className="relative min-h-[86vh] overflow-hidden text-white">
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,8,10,0.7)_0%,rgba(13,12,15,0.48)_45%,rgba(13,12,15,0.16)_100%)]" />
+      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#0f0d10]/68 to-transparent" />
 
-      <div
-        className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?auto=format&fit=crop&w=1600&q=80')] bg-cover bg-center opacity-35"
-        style={{
-          maskImage: 'linear-gradient(180deg, transparent, black 0%, black 70%, transparent)',
-          WebkitMaskImage:
-            'linear-gradient(180deg, transparent, black 0%, black 70%, transparent)',
-        }}
-      />
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,rgba(255,209,138,0.16),transparent_28%),linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.6))]" />
-
-      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-8 sm:px-6 md:pb-20 md:pt-10 lg:px-8">
-        <div className="mb-8 flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-xl sm:px-6">
+      <div className="relative mx-auto flex min-h-[86vh] max-w-7xl flex-col px-4 pb-8 pt-6 sm:px-6 lg:px-8">
+        <div className="design-topbar flex flex-col gap-4 rounded-lg px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.32em] text-zinc-400">PERIPHERAL STUDIO</p>
-            <p className="text-sm font-medium text-zinc-100">电影周边与表情包生成工作台</p>
+            <p className="text-[11px] uppercase tracking-[0.28em] text-white/52">Peripheral Studio</p>
+            <p className="mt-1 text-sm font-medium text-white">电影素材生成工作台</p>
           </div>
 
           {currentUser ? (
-            <div className="flex items-center gap-3">
-              <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/85 backdrop-blur-md sm:flex">
-                <User className="h-4 w-4 text-amber-100" />
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm text-white/86">
+                <User className="h-4 w-4 text-[#ffcf75]" />
                 <span>{currentUser.username || currentUser.email}</span>
               </div>
               <button
                 onClick={onLogout}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/14"
               >
                 <LogOut className="h-4 w-4" />
                 退出
@@ -105,7 +65,7 @@ export default function HeroSection({
           ) : (
             <button
               onClick={onLogin}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all hover:bg-zinc-100"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#151216] transition-colors hover:bg-[#f7f2eb]"
             >
               <User className="h-4 w-4" />
               登录 / 注册
@@ -113,40 +73,25 @@ export default function HeroSection({
           )}
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-8">
-          <div className="flex flex-col justify-center space-y-8 pt-8 lg:col-span-7">
-            <div className="animate-fade-in delay-100">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-md transition-colors hover:bg-white/10">
-                <span className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-300 sm:text-xs">
-                  AI 电影素材生成
-                  <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                </span>
-              </div>
+        <div className="flex flex-1 items-center py-12">
+          <div className="max-w-4xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-3 py-1.5 text-xs font-medium text-white/78 backdrop-blur">
+              <Sparkles className="h-3.5 w-3.5 text-[#ffcf75]" />
+              从电影素材到可传播内容
             </div>
 
-            <h1
-              className="animate-fade-in delay-200 max-w-4xl text-4xl font-medium leading-[0.94] tracking-tighter sm:text-5xl lg:text-6xl xl:text-7xl"
-              style={{
-                maskImage: 'linear-gradient(180deg, black 0%, black 80%, transparent 100%)',
-                WebkitMaskImage:
-                  'linear-gradient(180deg, black 0%, black 80%, transparent 100%)',
-              }}
-            >
-              把电影素材
-              <br />
-              <span className="bg-gradient-to-br from-white via-white to-[#ffcd75] bg-clip-text text-transparent">
-                变成表情包与建模图
-              </span>
+            <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[0.96] tracking-normal sm:text-6xl lg:text-7xl">
+              电影周边建模与表情包定制服务
             </h1>
 
-            <p className="animate-fade-in delay-300 max-w-xl text-lg leading-relaxed text-zinc-400">
-              上传剧照或角色素材，快速得到多版本表情包与标准三视图建模说明。
+            <p className="mt-6 max-w-2xl text-base leading-8 text-white/68 sm:text-lg">
+              上传剧照、海报或角色素材，快速生成聊天表情包与商家可用的三视图建模参考。
             </p>
 
-            <div className="animate-fade-in delay-400 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={onCreateEmoticon}
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-semibold text-zinc-950 transition-all hover:scale-[1.02] hover:bg-zinc-200 active:scale-[0.98]"
+                className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-[#151216] transition-transform hover:-translate-y-0.5 hover:bg-[#f7f2eb]"
               >
                 创建表情包
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -154,91 +99,39 @@ export default function HeroSection({
 
               <button
                 onClick={onCreateModel}
-                className="group inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white/20 hover:bg-white/10"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/16 bg-white/8 px-6 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/14"
               >
                 <Play className="h-4 w-4 fill-current" />
                 生成建模图
               </button>
             </div>
           </div>
+        </div>
 
-          <div className="space-y-6 lg:col-span-5 lg:mt-12">
-            <div className="animate-fade-in delay-500 relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
-              <div className="pointer-events-none absolute right-0 top-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+        <div className="grid gap-3 text-[#171513] md:grid-cols-[1fr_1fr_1.2fr]">
+          {PREVIEW_ITEMS.map((item) => (
+            <div key={item.label} className="rounded-lg border border-[#e7ddd1] bg-white/92 p-4 shadow-[0_18px_50px_rgba(16,13,10,0.12)] backdrop-blur">
+              <div className="text-2xl font-semibold">{item.value}</div>
+              <div className="mt-1 text-sm text-[#74695d]">{item.label}</div>
+            </div>
+          ))}
 
-              <div className="relative z-10">
-                <div className="mb-8 flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
-                    <Target className="h-6 w-6 text-white" />
+          <div className="rounded-lg border border-[#171513] bg-[#171513] p-4 text-white shadow-[0_18px_50px_rgba(16,13,10,0.18)] md:col-span-3 lg:col-span-1">
+            <div className="flex flex-wrap gap-3">
+              {OUTPUTS.map((item) => (
+                <div key={item.title} className="flex min-w-[220px] flex-1 gap-3">
+                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10">
+                    <item.icon className="h-4 w-4 text-[#ffcf75]" />
                   </div>
                   <div>
-                    <div className="text-3xl font-bold tracking-tight text-white">3-5</div>
-                    <div className="text-sm text-zinc-400">每次生成多版本内容</div>
-                  </div>
-                </div>
-
-                <div className="mb-8 space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">角色还原度</span>
-                    <span className="font-medium text-white">98%</span>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800/50">
-                    <div className="h-full w-[98%] rounded-full bg-gradient-to-r from-white to-zinc-400" />
-                  </div>
-                </div>
-
-                <div className="mb-6 h-px w-full bg-white/10" />
-
-                <div className="grid grid-cols-5 gap-4 text-center">
-                  <StatItem value="1:1" label="微信比例" />
-                  <div className="mx-auto h-full w-px bg-white/10" />
-                  <StatItem value="3视图" label="建模输出" />
-                  <div className="mx-auto h-full w-px bg-white/10" />
-                  <StatItem value="10/5" label="当前额度" />
-                </div>
-
-                <div className="mt-8 flex flex-wrap gap-2">
-                  <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-medium tracking-wide text-zinc-300">
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
-                    </span>
-                    可用中
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-medium tracking-wide text-zinc-300">
-                    <Crown className="h-3 w-3 text-yellow-500" />
-                    订阅版
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="animate-fade-in delay-500 relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 py-8 backdrop-blur-xl">
-              <h3 className="mb-6 px-8 text-sm font-medium text-zinc-400">核心能力</h3>
-
-              <div
-                className="relative flex overflow-hidden"
-                style={{
-                  maskImage:
-                    'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
-                  WebkitMaskImage:
-                    'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
-                }}
-              >
-                <div className="animate-marquee flex gap-12 whitespace-nowrap px-4">
-                  {[...CAPABILITIES, ...CAPABILITIES, ...CAPABILITIES].map((item, index) => (
-                    <div
-                      key={`${item.name}-${index}`}
-                      className="flex cursor-default items-center gap-2 opacity-60 grayscale transition-all hover:scale-105 hover:opacity-100 hover:grayscale-0"
-                    >
-                      <item.icon className="h-6 w-6 fill-current text-white" />
-                      <span className="text-lg font-bold tracking-tight text-white">
-                        {item.name}
-                      </span>
+                    <div className="flex items-center gap-1 text-sm font-semibold">
+                      <Check className="h-3.5 w-3.5 text-[#ffcf75]" />
+                      {item.title}
                     </div>
-                  ))}
+                    <p className="mt-1 text-xs leading-5 text-white/62">{item.text}</p>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

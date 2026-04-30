@@ -102,16 +102,16 @@ export default function FileUploader({
 
   if (preview) {
     return (
-      <div className="relative rounded-lg border-2 border-dashed border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20 p-4">
+      <div className="relative rounded-lg border border-emerald-200 bg-emerald-50 p-4">
         {/* Preview Image */}
         <div className="relative aspect-square max-w-[200px] mx-auto mb-3">
           <img
             src={preview}
             alt="Preview"
-            className="w-full h-full object-contain rounded-lg"
+            className="h-full w-full rounded-lg object-contain"
           />
           {uploadState.success && (
-            <div className="absolute -top-2 -right-2 bg-green-500 rounded-full p-1">
+            <div className="absolute -right-2 -top-2 rounded-full bg-emerald-500 p-1">
               <CheckCircle2 className="w-4 h-4 text-white" />
             </div>
           )}
@@ -119,10 +119,10 @@ export default function FileUploader({
 
         {/* File Info */}
         <div className="text-center space-y-2">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-[200px] mx-auto">
+          <p className="mx-auto max-w-[200px] truncate text-sm font-medium text-[#2f271f]">
             {fileName}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-[#6d6256]">
             图片已准备就绪
           </p>
         </div>
@@ -132,7 +132,7 @@ export default function FileUploader({
           variant="ghost"
           size="icon"
           onClick={handleRemove}
-          className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white dark:bg-gray-800/80 dark:hover:bg-gray-800"
+          className="absolute right-2 top-2 h-8 w-8 bg-white/85 hover:bg-white"
         >
           <X className="w-4 h-4" />
         </Button>
@@ -149,11 +149,11 @@ export default function FileUploader({
 
   return (
     <div
-      className={`relative rounded-lg border-2 border-dashed transition-all duration-200 ${
+      className={`relative rounded-lg border border-dashed bg-[#fbf7f1] transition-all duration-200 ${
         isDragging 
-          ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' 
-          : 'border-gray-300 dark:border-gray-700 hover:border-purple-400 dark:hover:border-purple-600'
-      } ${uploadState.error ? 'border-red-400 dark:border-red-700' : ''}`}
+          ? 'border-[#ff6848] bg-[#fff1eb]' 
+          : 'border-[#decfbd] hover:border-[#171513]'
+      } ${uploadState.error ? 'border-red-400' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -168,41 +168,41 @@ export default function FileUploader({
       <div className="flex flex-col items-center justify-center py-8 px-4">
         {uploadState.uploading ? (
           <>
-            <Loader2 className="w-10 h-10 text-purple-500 animate-spin mb-3" />
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <Loader2 className="mb-3 h-10 w-10 animate-spin text-[#ff6848]" />
+            <p className="text-sm text-[#6d6256]">
               上传中... {uploadState.progress}%
             </p>
             <Progress value={uploadState.progress} className="w-32 mt-2" />
           </>
         ) : uploadState.error ? (
           <>
-            <AlertCircle className="w-10 h-10 text-red-500 mb-3" />
-            <p className="text-sm text-red-600 dark:text-red-400">
+            <AlertCircle className="mb-3 h-10 w-10 text-red-500" />
+            <p className="text-sm text-red-600">
               {uploadState.error}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="mt-1 text-xs text-[#6d6256]">
               请重新选择文件上传
             </p>
           </>
         ) : (
           <>
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+            <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-lg ${
               isDragging 
-                ? 'bg-purple-100 dark:bg-purple-900/30' 
-                : 'bg-gray-100 dark:bg-gray-800'
+                ? 'bg-[#ffe1d7]' 
+                : 'bg-white'
             }`}>
               {isDragging ? (
-                <Upload className="w-8 h-8 text-purple-500" />
+                <Upload className="h-8 w-8 text-[#ff6848]" />
               ) : (
-                <ImageIcon className="w-8 h-8 text-gray-400" />
+                <ImageIcon className="h-8 w-8 text-[#8a7f73]" />
               )}
             </div>
             
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <p className="mb-1 text-sm font-medium text-[#2f271f]">
               {isDragging ? '释放以上传文件' : '点击或拖拽上传图片'}
             </p>
             
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-[#6d6256]">
               支持 JPG、PNG、WebP、GIF，最大 {maxSizeMB}MB
             </p>
           </>

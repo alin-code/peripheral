@@ -88,28 +88,28 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
   const currentPlanData = plans.find(p => p.id === currentPlan) || plans[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="design-page">
+      <div className="design-shell max-w-6xl">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-6">
-            <Crown className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+        <div className="mb-12 text-center text-white">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 backdrop-blur">
+            <Crown className="w-5 h-5 text-[#ffcf75]" />
+            <span className="text-sm font-medium text-white/78">
               订阅管理
             </span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="mb-4 text-4xl font-semibold tracking-normal text-white">
             解锁更多生成能力
           </h1>
           
-          <p className="text-lg text-gray-600 dark:text-gray-300">
+          <p className="text-lg text-white/62">
             选择适合你的订阅方案，开启无限创意
           </p>
         </div>
 
         {/* Current Usage */}
-        <Card className="mb-12">
+        <Card className="design-panel mb-12 rounded-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="w-5 h-5" />
@@ -124,7 +124,7 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4 text-pink-500" />
+                    <MessageCircle className="w-4 h-4 text-[#ff6848]" />
                     <span className="text-sm font-medium">表情包生成</span>
                   </div>
                   <Badge variant="outline">
@@ -140,7 +140,7 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <Box className="w-4 h-4 text-blue-500" />
+                    <Box className="w-4 h-4 text-[#31c5ff]" />
                     <span className="text-sm font-medium">建模图生成</span>
                   </div>
                   <Badge variant="outline">
@@ -161,12 +161,12 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
           {plans.map((plan) => (
             <Card 
               key={plan.id}
-              className={`relative overflow-hidden transition-all duration-300 hover:-translate-y-1 ${
-                plan.recommended ? 'border-purple-500 shadow-xl' : ''
+              className={`design-panel relative overflow-hidden rounded-lg transition-all duration-300 hover:-translate-y-1 ${
+                plan.recommended ? 'border-[#ff6848] shadow-xl' : ''
               }`}
             >
               {plan.recommended && (
-                <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center py-1 text-xs font-medium">
+                <div className="absolute left-0 right-0 top-0 bg-[#ff6848] py-1 text-center text-xs font-medium text-white">
                   推荐方案
                 </div>
               )}
@@ -174,7 +174,7 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
               <CardHeader className={`pt-12 ${!plan.recommended ? 'pt-8' : ''}`}>
                 <CardTitle className="text-2xl">{plan.name}</CardTitle>
                 <CardDescription>
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-3xl font-bold text-[#171513]">
                     {plan.price}
                   </span>
                 </CardDescription>
@@ -185,7 +185,7 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-600 dark:text-gray-300">{feature}</span>
+                      <span className="text-[#6d6256]">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -193,10 +193,10 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
                 <Button 
                   className={`w-full ${
                     plan.id === currentPlan 
-                      ? 'bg-gray-400 cursor-not-allowed' 
+                      ? 'cursor-not-allowed bg-gray-400' 
                       : plan.recommended 
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
-                        : 'bg-blue-500 hover:bg-blue-600'
+                        ? 'bg-[#ff6848] hover:bg-[#e8583d]'
+                        : 'bg-[#171513] hover:bg-[#2a2320]'
                   }`}
                   disabled={plan.id === currentPlan}
                 >
@@ -209,7 +209,7 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
         </div>
 
         {/* Merchant Service */}
-        <Card className="mb-12 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
+        <Card className="design-panel mb-12 rounded-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="w-5 h-5" />
@@ -221,32 +221,32 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-3 gap-4 mb-6">
-              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
-                <Users className="w-8 h-8 text-purple-500 mb-2" />
+              <div className="design-muted-card rounded-lg p-4">
+                <Users className="mb-2 h-8 w-8 text-[#ff6848]" />
                 <h4 className="font-medium mb-1">供应链对接</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[#6d6256]">
                   匹配优质原材料供应商和代工厂
                 </p>
               </div>
               
-              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
-                <Headphones className="w-8 h-8 text-blue-500 mb-2" />
+              <div className="design-muted-card rounded-lg p-4">
+                <Headphones className="mb-2 h-8 w-8 text-[#31c5ff]" />
                 <h4 className="font-medium mb-1">专属客服</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[#6d6256]">
                   1对1技术支持和订单跟进
                 </p>
               </div>
               
-              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
-                <Box className="w-8 h-8 text-green-500 mb-2" />
+              <div className="design-muted-card rounded-lg p-4">
+                <Box className="mb-2 h-8 w-8 text-emerald-600" />
                 <h4 className="font-medium mb-1">批量订单</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[#6d6256]">
                   支持大批量定制生产
                 </p>
               </div>
             </div>
             
-            <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+            <Button className="design-primary">
               <Building2 className="w-4 h-4 mr-2" />
               申请商家资质
             </Button>
@@ -254,28 +254,28 @@ export default function SubscriptionManager({ onClose }: SubscriptionManagerProp
         </Card>
 
         {/* FAQ */}
-        <Card>
+        <Card className="design-panel rounded-lg">
           <CardHeader>
             <CardTitle>常见问题</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="design-muted-card rounded-lg p-4">
               <h4 className="font-medium mb-2">额度多久重置？</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-[#6d6256]">
                 每日额度在每天00:00重置，未使用的额度不会累积到下一天
               </p>
             </div>
             
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="design-muted-card rounded-lg p-4">
               <h4 className="font-medium mb-2">如何升级套餐？</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-[#6d6256]">
                 点击「立即升级」按钮，选择支付方式完成付款即可立即生效
               </p>
             </div>
             
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="design-muted-card rounded-lg p-4">
               <h4 className="font-medium mb-2">商家资质如何申请？</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-[#6d6256]">
                 在建模图生成页面填写商家信息，或直接联系客服提交资质证明
               </p>
             </div>

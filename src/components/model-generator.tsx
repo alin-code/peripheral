@@ -165,28 +165,28 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20">
-      <div className="container mx-auto px-4 py-8">
+    <div className="design-page">
+      <div className="design-shell">
         {/* Header */}
         <div className="mb-8">
           <Button 
             variant="ghost" 
             onClick={onBack}
-            className="mb-4 text-gray-700 hover:bg-white/70"
+            className="mb-4 text-white/78 hover:bg-white/10 hover:text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             返回服务选择
           </Button>
           
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
+            <div className="rounded-lg bg-[#31c5ff] p-2">
               <Box className="w-6 h-6 text-white" />
             </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-semibold tracking-normal text-white">
               周边建模图生成
             </h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-white/62">
             输出三视图与建模说明
           </p>
         </div>
@@ -195,7 +195,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
           {/* Input Panel */}
           <div className="space-y-6">
             {/* Basic Info Card */}
-            <Card>
+            <Card className="design-panel rounded-lg">
               <CardHeader>
                 <CardTitle>基础信息</CardTitle>
                 <CardDescription>上传素材并填写角色信息</CardDescription>
@@ -204,17 +204,17 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
               <CardContent className="space-y-6">
                 {/* Image Input */}
                 <Tabs value={inputMode} onValueChange={(v) => setInputMode(v as 'upload' | 'url')}>
-                  <TabsList className="grid w-full grid-cols-2 rounded-xl bg-[#dfeaf1] p-1.5">
+                  <TabsList className="grid w-full grid-cols-2 rounded-lg border border-[#d8e2e8] bg-[#eaf1f5] p-1.5">
                     <TabsTrigger
                       value="upload"
-                      className="gap-2 rounded-lg border border-transparent text-sm font-semibold text-[#4b5f6a] data-[state=active]:border-[#103c52] data-[state=active]:bg-[#154964] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(21,73,100,0.18)]"
+                      className="gap-2 rounded-md border border-transparent text-sm font-semibold text-[#4b5f6a] data-[state=active]:border-[#171513] data-[state=active]:bg-[#171513] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(21,73,100,0.18)]"
                     >
                       <Sparkles className="w-4 h-4" />
                       本地上传
                     </TabsTrigger>
                     <TabsTrigger
                       value="url"
-                      className="gap-2 rounded-lg border border-transparent text-sm font-semibold text-[#4b5f6a] data-[state=active]:border-[#0f5c78] data-[state=active]:bg-[#0e7490] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(14,116,144,0.18)]"
+                      className="gap-2 rounded-md border border-transparent text-sm font-semibold text-[#4b5f6a] data-[state=active]:border-[#171513] data-[state=active]:bg-[#171513] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(14,116,144,0.18)]"
                     >
                       <Link className="w-4 h-4" />
                       图片链接
@@ -240,6 +240,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                           type="url"
                           placeholder="https://example.com/character.jpg"
                           value={imageUrl}
+                          className="design-input"
                           onChange={(e) => {
                             setImageUrl(e.target.value);
                             setUploadedFile(null);
@@ -274,6 +275,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                     id="modelCharacterName"
                     placeholder="例如：钢铁侠、迪士尼公主"
                     value={characterName}
+                    className="design-input"
                     onChange={(e) => setCharacterName(e.target.value)}
                   />
                 </div>
@@ -289,8 +291,8 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                         onClick={() => setMaterial(option.value as typeof material)}
                         className={
                           material === option.value
-                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                            : 'border-gray-300 bg-white text-gray-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700'
+                            ? 'border-[#171513] bg-[#171513] text-white hover:bg-[#2a2320]'
+                            : 'design-secondary'
                         }
                         size="sm"
                       >
@@ -315,8 +317,8 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                         onClick={() => setScale(option.value as typeof scale)}
                         className={
                           scale === option.value
-                            ? 'bg-cyan-600 text-white hover:bg-cyan-700'
-                            : 'border-gray-300 bg-white text-gray-700 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-700'
+                            ? 'border-[#31c5ff] bg-[#31c5ff] text-[#0d1a20] hover:bg-[#69d7ff]'
+                            : 'design-secondary'
                         }
                       >
                         <Ruler className="w-4 h-4 mr-1" />
@@ -332,7 +334,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
             </Card>
 
             {/* Merchant Info Card */}
-            <Card>
+            <Card className="design-panel rounded-lg">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -346,6 +348,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                     variant={isMerchant ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setIsMerchant(!isMerchant)}
+                    className={isMerchant ? 'bg-[#171513] text-white hover:bg-[#2a2320]' : 'design-secondary'}
                   >
                     {isMerchant ? '已启用' : '启用'}
                   </Button>
@@ -360,6 +363,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                       id="businessName"
                       placeholder="例如：某某手办工作室"
                       value={businessName}
+                      className="design-input"
                       onChange={(e) => setBusinessName(e.target.value)}
                     />
                   </div>
@@ -370,6 +374,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                       id="businessScope"
                       placeholder="例如：树脂手办制作、PVC可动人偶、景品代工"
                       value={businessScope}
+                      className="design-input"
                       onChange={(e) => setBusinessScope(e.target.value)}
                       rows={2}
                     />
@@ -381,12 +386,13 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                       id="businessContact"
                       placeholder="电话/微信/邮箱"
                       value={businessContact}
+                      className="design-input"
                       onChange={(e) => setBusinessContact(e.target.value)}
                     />
                   </div>
 
-                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <p className="text-sm text-blue-700 dark:text-blue-400">
+                  <div className="design-muted-card rounded-lg p-3">
+                    <p className="text-sm text-[#6d6256]">
                       可用于后续商家对接
                     </p>
                   </div>
@@ -398,7 +404,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
             <Button
               onClick={handleGenerate}
               disabled={isGenerating || !characterName || (!uploadedFile && !imageUrl)}
-              className="w-full border border-cyan-300/40 bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold text-white shadow-[0_12px_30px_rgba(37,99,235,0.22)] hover:from-blue-700 hover:to-cyan-600"
+              className="w-full border border-[#31c5ff] bg-[#31c5ff] font-semibold text-[#0d1a20] shadow-[0_12px_30px_rgba(49,197,255,0.22)] hover:bg-[#69d7ff]"
               size="lg"
             >
               {isGenerating ? (
@@ -413,14 +419,14 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
 
             {/* Error */}
             {error && (
-              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3">
                 <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
           </div>
 
           {/* Output Panel */}
-          <Card>
+          <Card className="design-panel rounded-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -444,13 +450,13 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                     cardImages={loadingCardImages}
                     repeat={6}
                     initialSpeed={165}
-                    className="rounded-[30px]"
+                    className="rounded-lg"
                   />
 
-                  <div className="rounded-2xl border border-cyan-200/50 bg-gradient-to-r from-blue-50 via-white to-cyan-50 p-4">
+                  <div className="rounded-lg border border-[#d8e2e8] bg-[#f4fbff] p-4">
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-medium text-gray-700">生成进度</span>
-                      <span className="font-semibold text-cyan-600">{progress}%</span>
+                      <span className="font-semibold text-[#0b7496]">{progress}%</span>
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
                       正在分析三视图、尺寸比例与材质建议，请稍候。
@@ -459,7 +465,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                 </div>
               ) : !modelData ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-[#e8f6fb]">
                     <Box className="w-8 h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-500 dark:text-gray-400">
@@ -475,7 +481,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                         <Layers className="w-4 h-4" />
                         参考图
                       </Label>
-                      <div className="relative aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                      <div className="relative aspect-video overflow-hidden rounded-lg bg-[#e8f6fb]">
                         <img
                           src={modelData.referenceImage}
                           alt="建模参考图"
@@ -486,10 +492,10 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                   )}
 
                   {/* Character Info */}
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg">
+                  <div className="rounded-lg border border-[#d8e2e8] bg-[#f4fbff] p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold text-lg">{modelData.characterName}</h3>
-                      <Badge className="bg-blue-500">{modelData.scale}</Badge>
+                      <Badge className="bg-[#31c5ff] text-[#0d1a20]">{modelData.scale}</Badge>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       材质：{modelData.material.材质名称}
@@ -506,9 +512,9 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                       {Object.entries(modelData.dimensions)
                         .filter(([key]) => !['单位', '备注'].includes(key))
                         .map(([key, value]) => (
-                          <div key={key} className="p-3 bg-white dark:bg-gray-800 rounded-lg border">
+                          <div key={key} className="rounded-lg border border-[#eadfd2] bg-white p-3">
                             <div className="text-xs text-gray-500 mb-1">{key}</div>
-                            <div className="font-semibold text-blue-600">{value}</div>
+                            <div className="font-semibold text-[#0b7496]">{value}</div>
                           </div>
                         ))}
                     </div>
@@ -521,7 +527,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                   <div className="space-y-2">
                     <Label>三视图描述</Label>
                     <div className="space-y-3">
-                      <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
+                      <div className="rounded-lg border border-[#eadfd2] bg-white p-3">
                         <div className="font-medium text-sm mb-1 flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">正面</Badge>
                         </div>
@@ -530,7 +536,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                         </p>
                       </div>
                       
-                      <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
+                      <div className="rounded-lg border border-[#eadfd2] bg-white p-3">
                         <div className="font-medium text-sm mb-1 flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">侧面</Badge>
                         </div>
@@ -539,7 +545,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                         </p>
                       </div>
                       
-                      <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
+                      <div className="rounded-lg border border-[#eadfd2] bg-white p-3">
                         <div className="font-medium text-sm mb-1 flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">背面</Badge>
                         </div>
@@ -556,12 +562,12 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                       <Palette className="w-4 h-4" />
                       材质建议
                     </Label>
-                    <div className="p-4 bg-white dark:bg-gray-800 rounded-lg space-y-2">
+                    <div className="space-y-2 rounded-lg border border-[#eadfd2] bg-white p-4">
                       <p className="text-sm font-medium">{modelData.material.材质名称}</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         {modelData.material.材质描述}
                       </p>
-                      <div className="flex gap-4 text-xs">
+                      <div className="grid gap-2 text-xs sm:grid-cols-2">
                         <span className="text-green-600">✓ {modelData.material.优点}</span>
                         <span className="text-orange-600">✗ {modelData.material.缺点}</span>
                       </div>
@@ -574,7 +580,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                   {/* Production Notes */}
                   <div className="space-y-2">
                     <Label>生产工艺提示</Label>
-                    <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                    <ul className="space-y-1 rounded-lg border border-[#eadfd2] bg-[#fbf7f1] p-3 text-xs text-[#6d6256]">
                       {modelData.productionNotes.map((note, i) => (
                         <li key={i}>{note}</li>
                       ))}
@@ -584,7 +590,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                   {/* File Format */}
                   <div className="space-y-2">
                     <Label>文件格式要求</Label>
-                    <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
+                    <div className="rounded-lg border border-[#eadfd2] bg-white p-3">
                       <div className="flex flex-wrap gap-2 mb-2">
                         {modelData.fileFormat.推荐格式.map((format) => (
                           <Badge key={format} variant="secondary">{format}</Badge>
@@ -597,7 +603,7 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
                   </div>
 
                   {/* Success Message */}
-                  <div className="flex items-center gap-2 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
                     <CheckCircle2 className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-sm font-medium text-green-800 dark:text-green-300">
@@ -611,11 +617,11 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
 
                   {/* Business Info */}
                   {modelData.businessInfo && (
-                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                      <h4 className="font-medium text-purple-900 dark:text-purple-300 mb-2">
+                    <div className="design-muted-card rounded-lg p-4">
+                      <h4 className="mb-2 font-medium text-[#2f271f]">
                         商家对接信息
                       </h4>
-                      <div className="text-sm text-purple-700 dark:text-purple-400 space-y-1">
+                      <div className="space-y-1 text-sm text-[#6d6256]">
                         <p>商家名称：{modelData.businessInfo.商家名称}</p>
                         <p>业务范围：{modelData.businessInfo.业务范围}</p>
                         <p>联系方式：{modelData.businessInfo.联系方式}</p>
@@ -631,13 +637,13 @@ export default function ModelGenerator({ onBack }: ModelGeneratorProps) {
 
         {/* Subscription Hint */}
         <div className="mt-8 text-center">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-md">
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#eadfd2] bg-white/90 px-6 py-3 shadow-md backdrop-blur-sm">
+            <span className="text-sm text-[#5f5549]">
               当前订阅额度：
             </span>
-            <Badge className="bg-blue-500">建模图 1/5</Badge>
+            <Badge className="bg-[#31c5ff] text-[#0d1a20]">建模图 1/5</Badge>
             <span className="text-sm text-gray-500">|</span>
-            <Button variant="link" className="text-sm text-blue-600 p-0 h-auto">
+            <Button variant="link" className="h-auto p-0 text-sm text-[#171513]">
               升级解锁更多额度 →
             </Button>
           </div>

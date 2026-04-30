@@ -4,34 +4,29 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: '新应用 | 扣子编程',
-    template: '%s | 扣子编程',
+    default: 'Peripheral Studio | 电影周边与表情包生成',
+    template: '%s | Peripheral Studio',
   },
   description:
-    '扣子编程是一款一站式云端 Vibe Coding 开发平台。通过对话轻松构建智能体、工作流和网站，实现从创意到上线的无缝衔接。',
+    '基于电影素材生成表情包与周边建模参考图，帮助内容创作者和商家快速完成视觉产物。',
   keywords: [
-    '扣子编程',
-    'Coze Code',
-    'Vibe Coding',
-    'AI 编程',
-    '智能体搭建',
-    '工作流搭建',
-    '网站搭建',
-    '网站部署',
-    '全栈开发',
-    'AI 工程师',
+    '电影周边',
+    '表情包生成',
+    '建模图生成',
+    '三视图',
+    'AI 图片生成',
   ],
-  authors: [{ name: 'Coze Code Team', url: 'https://code.coze.cn' }],
-  generator: 'Coze Code',
+  authors: [{ name: 'Peripheral Studio' }],
+  generator: 'Peripheral Studio',
   // icons: {
   //   icon: '',
   // },
   openGraph: {
-    title: '扣子编程 | 你的 AI 工程师已就位',
+    title: 'Peripheral Studio | 电影周边与表情包生成',
     description:
-      '我正在使用扣子编程 Vibe Coding，让创意瞬间上线。告别拖拽，拥抱心流。',
-    url: 'https://code.coze.cn',
-    siteName: '扣子编程',
+      '上传剧照、海报或角色素材，快速生成表情包与商家可用的建模参考图。',
+    url: 'https://peripheral-cyan.vercel.app',
+    siteName: 'Peripheral Studio',
     locale: 'zh_CN',
     type: 'website',
     // images: [
@@ -64,16 +59,16 @@ export default function RootLayout({
   const isDev = process.env.COZE_PROJECT_ENV === 'DEV';
 
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body className={`antialiased`}>
         {isDev && <Inspector />}
         {children}
         <div className="pointer-events-none fixed bottom-4 right-4 z-50 max-w-[calc(100vw-2rem)]">
-          <div className="pointer-events-auto rounded-full border border-white/12 bg-black/65 px-4 py-2 text-xs text-white/78 shadow-lg backdrop-blur-xl">
-            问题反馈请发送邮件到：
+          <div className="pointer-events-auto rounded-full border border-white/12 bg-[#111014]/82 px-4 py-2 text-xs text-white/82 shadow-lg backdrop-blur-xl">
+            反馈：
             <a
               href="mailto:feedback@peripheral-cyan.vercel.app"
-              className="ml-1 text-amber-200 hover:text-amber-100"
+              className="ml-1 text-[#ffcf75] hover:text-white"
             >
               feedback@peripheral-cyan.vercel.app
             </a>

@@ -84,9 +84,9 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#f7efe4_0%,#f5e6d4_18%,#111016_70%)]">
+      <div className="design-page flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-16 w-16 rounded-full border-4 border-amber-100/35 border-t-transparent animate-spin"></div>
+          <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-white/24 border-t-[#ffcf75]"></div>
           <p className="text-sm uppercase tracking-[0.35em] text-white/55">加载中</p>
         </div>
       </div>
